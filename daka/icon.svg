@@ -1,11 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<defs><clipPath id="sq"><rect width="512" height="512"/></clipPath></defs>
-<g clip-path="url(#sq)">
-<rect width="512" height="512" fill="#FFFFFF"/>
-<circle cx="-11" cy="-10" r="213" fill="#FFC700"/>
-<polygon points="0,330 330,0 457,0 0,457" fill="#FF2D00"/>
-<circle cx="391" cy="421" r="282" fill="#001F7A"/>
-<circle cx="391" cy="421" r="189" fill="#FFFFFF"/>
-<polyline points="365,302 365,381 437,423" fill="none" stroke="#001F7A" stroke-width="41" stroke-linecap="round" stroke-linejoin="round"/>
-</g>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<title>打卡 App icon — E2 指針站牌｜白底＋黃</title>
+<rect width="1024" height="1024" fill="#FFFFFF"/>
+<path d="M860 590 A300 300 0 0 1 710 850" fill="none" stroke="#FFD300" stroke-width="120" stroke-linecap="butt"/>
+<rect x="0" y="515" width="560" height="150" fill="#DC241F"/>
+<rect x="510" y="0" width="100" height="590" fill="#00923F"/>
+<circle cx="560" cy="590" r="100" fill="#0019A8"/>
 </svg>

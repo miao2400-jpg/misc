@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+<title>打卡 App icon — E2 指針站牌｜藍底</title>
+<rect width="1024" height="1024" fill="#0019A8"/>
+<path d="M860 590 A300 300 0 0 1 710 850" fill="none" stroke="#FFD300" stroke-width="120" stroke-linecap="butt"/>
+<rect x="0" y="515" width="560" height="150" fill="#DC241F"/>
+<rect x="510" y="0" width="100" height="590" fill="#00923F"/>
+<circle cx="560" cy="590" r="100" fill="#FFFFFF"/>
+</svg>
