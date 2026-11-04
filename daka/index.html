@@ -143,7 +143,6 @@
 <!-- ───────── 打卡 ───────── -->
 <section id="tab-punch">
   <div id="banner-config" class="banner warn" hidden>還沒有設定表單。請到「設定」貼上設定碼。</div>
-  <div id="banner-month" class="banner warn" hidden></div>
   <div id="banner-pending" class="banner warn" hidden></div>
   <div class="card">
     <h2>今天</h2>
@@ -233,8 +232,10 @@
     <label class="f"><span>HR 稱呼（例如：人資）</span><input id="cfg-hr-name" type="text"></label>
     <label class="f"><span>HR Email</span><input id="cfg-hr-email" type="email" autocomplete="off" inputmode="email"></label>
     <label class="chk" style="margin-top:6px"><input id="cfg-cc-hr" type="checkbox"> 寄給主管時副本 HR（先問過 HR 再勾）</label>
-    <label class="f"><span>上班時間</span><input id="cfg-work-start" type="time"></label>
-    <label class="f"><span>下班時間</span><input id="cfg-work-end" type="time"></label>
+    <div class="row">
+      <label class="f"><span>上班時間（例如 0900）</span><input id="cfg-work-start" type="text" inputmode="numeric" autocomplete="off" placeholder="0900"></label>
+      <label class="f"><span>下班時間（例如 1800）</span><input id="cfg-work-end" type="text" inputmode="numeric" autocomplete="off" placeholder="1800"></label>
+    </div>
   </div>
   <div class="card">
     <h2>跨裝置同步（用你自己的 Google 試算表）</h2>
@@ -245,8 +246,8 @@
   </div>
   <div class="card">
     <h2>打卡表單</h2>
-    <label class="f"><span>表單網址（每月換表單時貼新的）</span><input id="cfg-clockin-url" type="url" autocomplete="off"></label>
-    <label class="f"><span>表單說明（例如：10月出席紀錄）</span><input id="cfg-clockin-desc" type="text"></label>
+    <label class="f"><span>表單網址（HR 換新表單時才需要改）</span><input id="cfg-clockin-url" type="url" autocomplete="off"></label>
+    <label class="f"><span>表單說明</span><input id="cfg-clockin-desc" type="text"></label>
     <label class="f"><span>打卡的送出方式</span>
       <select id="cfg-submit-mode">
         <option value="iframe">直接送出，確認畫面顯示在下方</option>
@@ -284,15 +285,8 @@
     </details>
   </div>
   <div class="card">
-    <details>
-      <summary>每個月換表單怎麼辦</summary>
-      <p>HR 給新連結時，先在 Safari 打開它，複製網址列裡 docs.google.com 開頭的完整網址，貼到上面的「表單網址」，說明改成新的月份。然後按上面的「用表單網頁試開一次」，看到「上班」和地點已經選好，代表題目代號沒變，關掉表單就好，不要按提交。</p>
-      <p>如果打開後選項沒有預選，代號變了，把新連結貼給 Claude 重新產生設定碼。</p>
-    </details>
-  </div>
-  <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.16 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.17 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -406,11 +400,6 @@ function renderStatus(){
   si.textContent=ins.length?ins[ins.length-1].time:'—'; si.className='val'+(ins.length?'':' empty');
   so.textContent=outs.length?outs[outs.length-1].time:'—'; so.className='val'+(outs.length?'':' empty');
   $('banner-config').hidden=hasForm('clockin');
-  var bm=$('banner-month'); bm.hidden=true;
-  if(hasForm('clockin')&&cfg.forms.clockin.desc){
-    var m=/(\d{1,2})\s*月/.exec(cfg.forms.clockin.desc);
-    if(m&&(+m[1])!==(new Date().getMonth()+1)){ bm.textContent='設定裡的打卡表單是「'+cfg.forms.clockin.desc+'」，現在是 '+(new Date().getMonth()+1)+' 月，可能要向 HR 要新連結。'; bm.hidden=false; }
-  }
   var bp=$('banner-pending'); bp.hidden=true;
   var open=liveLog().filter(function(r){ return r.status==='pending'||r.status==='unconfirmed'; });
   if(open.length&&$('result-card').hidden){
@@ -1020,7 +1009,11 @@ function readSettings(){
   else cfg.sync={url:su,token:st};
   cfg.supervisor.title=$('cfg-sup-title').value.trim(); cfg.supervisor.email=$('cfg-sup-email').value.trim();
   cfg.hr.name=$('cfg-hr-name').value.trim(); cfg.hr.email=$('cfg-hr-email').value.trim(); cfg.ccHr=$('cfg-cc-hr').checked;
-  cfg.work.start=$('cfg-work-start').value||'09:00'; cfg.work.end=$('cfg-work-end').value||'18:00';
+  var wsIn=$('cfg-work-start').value.trim(), weIn=$('cfg-work-end').value.trim();
+  var wsV=parseTimeInput(wsIn), weV=parseTimeInput(weIn);
+  if((wsIn&&!wsV)||(weIn&&!weV)) toast('上下班時間請輸入四位數，例如 0900、1800','err');
+  cfg.work.start=wsV||normHM(ows,'09:00'); cfg.work.end=weV||normHM(owe,'18:00');
+  $('cfg-work-start').value=cfg.work.start; $('cfg-work-end').value=cfg.work.end;
   var u=$('cfg-clockin-url').value.trim();
   var curURL=(cfg.forms.clockin&&cfg.forms.clockin.url)||'';
   if(u&&cleanURL(u)!==curURL){
