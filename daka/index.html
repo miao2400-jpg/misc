@@ -272,7 +272,7 @@
   </div>
   <div class="card">
     <h2>忘記打卡提醒（iPhone 捷徑）</h2>
-    <p class="small">捷徑每天在固定時間問同步試算表「今天打卡了沒」，沒打才跳通知。週末、下面的放假日、申請頁送出的請假時段都會自動跳過。</p>
+    <p class="small">捷徑在你設定的時間問同步試算表「現在該打的卡打了沒」，沒打才跳通知。週末、下面的放假日、申請頁送出的請假時段都會自動跳過。</p>
     <div id="remind-box"></div>
     <h3 class="sub-h">不用提醒的日子</h3>
     <p class="small">已內建 2026–2027 國定假日。公司另外放假的日子在這裡加入。</p>
@@ -280,27 +280,26 @@
     <div id="off-list"></div>
     <details>
       <summary>捷徑設定步驟</summary>
-      <p><b>先做兩個捷徑</b>（「捷徑」App 下方的「捷徑」分頁）：</p>
+      <p><b>先做一個捷徑</b>（「捷徑」App 下方的「捷徑」分頁）：</p>
       <ol>
-        <li>右上角「＋」，命名「上班檢查」。</li>
-        <li>加入「取得 URL 的內容」，貼上「上班檢查網址」。</li>
-        <li>加入「如果」，條件設成「URL 的內容」「包含」「還沒」。</li>
+        <li>右上角「＋」，命名「打卡檢查」。</li>
+        <li>加入「取得 URL 的內容」，貼上上面複製的「檢查網址」。</li>
+        <li>加入「如果」，條件設成「URL 的內容」（類型選「文字」）「包含」「還沒」。</li>
         <li>加入「顯示通知」，拖到「如果」和「否則」中間，內容選「URL 的內容」。</li>
-        <li>照樣再做一個「下班檢查」，網址換成「下班檢查網址」。</li>
       </ol>
-      <p><b>再做自動化</b>（「自動化」分頁，每個時間一個）：</p>
+      <p><b>再做自動化</b>（「自動化」分頁，每個時間一個，都執行同一個「打卡檢查」）：</p>
       <ol>
-        <li>「＋」→「特定時間」，設時間；重複選「每週」，只勾星期一到五；選「立即執行」。</li>
-        <li>只加一個動作「執行捷徑」，選「上班檢查」或「下班檢查」。</li>
-        <li>上班：08:30、08:45、09:00、09:15、09:30；下班：17:30、17:45、18:00、18:15、18:30。</li>
+        <li>「＋」→「特定時間」，設時間；重複選「每週」，只勾星期一到五；選「立即執行」，關掉「執行時通知」。</li>
+        <li>只加一個動作「執行捷徑」，選「打卡檢查」。</li>
+        <li>建議時間：早上 08:45、09:15、09:45；晚上 17:45 起每 30 分鐘到 20:15。時間點越密，提醒越準時。</li>
       </ol>
-      <p>打過卡之後的檢查都不會跳通知。下班檢查會看你今天幾點打上班卡，做滿工時（上班到下班的時數）之前不提醒。</p>
-      <p>想先試試看：把檢查網址貼到 Safari 打開，會看到「還沒打上班卡！」或「今天已打上班卡」。</p>
+      <p>同一個網址會自己判斷：08:30 起還沒打上班卡就提醒；打了上班卡，滿 9 小時（含午休）還沒打下班卡就提醒；打過、請假、週末、放假日都不提醒。</p>
+      <p>想先試試看：把檢查網址貼到 Safari 打開，會看到「還沒打上班卡！」或「預計 18:24 下班，現在不用提醒」這類的一句話。</p>
     </details>
   </div>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.21 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.22 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -995,7 +994,7 @@ function checkURL(type){ return cfg.sync.url+'?token='+encodeURIComponent(cfg.sy
 function renderRemind(){
   var box=$('remind-box'); box.innerHTML='';
   if(!syncReady()){ box.appendChild(el('p',{class:'small err',text:'要先設定上面的跨裝置同步，才能用提醒。'})); return; }
-  [['in','上班檢查網址'],['out','下班檢查網址']].forEach(function(t){
+  [['auto','檢查網址']].forEach(function(t){
     var b=el('button',{type:'button',class:'btn block',text:'複製'+t[1]});
     b.addEventListener('click',function(){ copyText(checkURL(t[0]),'已複製'+t[1]+'，貼到捷徑的「取得 URL 的內容」'); });
     box.appendChild(b);
