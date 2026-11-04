@@ -21,14 +21,14 @@
   :root{
     --bg:#FCFCFA;--card:#FFFFFF;--ink:#1B1A18;--sub:#6E6A64;--faint:#8C8781;
     --line:#E7E4DD;--line-strong:#D6D3CB;
-    --navy:#203588;--navy-2:#2B44A0;--accent:#E7A93C;--safe:#1C6E3F;--terra:#B4471F;--danger:#B23125;
+    --navy:#20374B;--navy-2:#2C4A63;--accent:#E7A93C;--safe:#3E7A55;--terra:#B4471F;--danger:#B23125;
     --warn-bg:#FFF4D6;--warn-ink:#6B4E00;--ok-bg:#E6F2EA;--ok-ink:#1F5234;--err-bg:#F8E3E0;--err-ink:#7A1F17;
-    --link:#203588;--field:#8C8781;--dis-bg:#ECE9E2;--dis-ink:#66625C;
+    --link:#20374B;--field:#8C8781;--dis-bg:#ECE9E2;--dis-ink:#66625C;
     --r-lg:6px;--r:4px;--r-sm:2px;
   }
   @media (prefers-color-scheme: dark){
     :root{--bg:#141516;--card:#1E2022;--ink:#F1EFEA;--sub:#B5B0A8;--faint:#8C8781;--line:#2E3134;--line-strong:#3C4044;
-      --warn-bg:#3A2E0E;--warn-ink:#F3D38A;--ok-bg:#15301F;--ok-ink:#A9DCB9;--err-bg:#3B1A16;--err-ink:#F3B0A8;--danger:#F09B90;--link:#B1C0F1;--field:#77726B;--dis-bg:#2A2D30;--dis-ink:#A7A29A;--navy:#3F58B0;--navy-2:#4C66BD;}
+      --warn-bg:#3A2E0E;--warn-ink:#F3D38A;--ok-bg:#15301F;--ok-ink:#A9DCB9;--err-bg:#3B1A16;--err-ink:#F3B0A8;--danger:#F09B90;--link:#9DB2C4;--field:#77726B;--dis-bg:#2A2D30;--dis-ink:#A7A29A;--navy:#3F6A91;--navy-2:#4C7CA6;}
   }
   *{box-sizing:border-box;margin:0;padding:0}
   [hidden]{display:none!important}
@@ -64,7 +64,6 @@
   .big button{font:inherit;font-size:26px;font-weight:700;color:#fff;border:0;border-radius:var(--r-lg);padding:26px 8px;letter-spacing:.06em;-webkit-tap-highlight-color:transparent}
   .big .in{background:var(--safe)} .big .out{background:var(--navy)}
   .big button.ghost{background:var(--card);color:var(--link);box-shadow:inset 0 0 0 1.5px var(--navy)}
-  @media (prefers-color-scheme: dark){ .big button.ghost{box-shadow:inset 0 0 0 1.5px var(--link)} }
   .big button:disabled{background:var(--dis-bg);color:var(--dis-ink);box-shadow:none}
   .big button.done,.big button.done:disabled{background:var(--ok-bg);color:var(--ok-ink);box-shadow:none;font-size:20px}
   .lock-note{text-align:center;margin:2px 0 4px}
@@ -299,7 +298,7 @@
   </div>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.21 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.20 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
