@@ -192,6 +192,7 @@
     <p class="small" id="sender-hint" style="margin-top:6px" hidden></p>
     <button class="btn block" id="btn-form">② 開啟表單</button>
     <div id="form-days"></div>
+    <button class="btn block" id="btn-ics" hidden>③ 加到行事曆（Outlook）</button>
     <p class="small" style="margin-top:8px">信會在你的郵件 App 打開，看一眼再按傳送；打不開或開錯信箱時，用「複製信件內容」貼到 Outlook。表單會在 Safari 打開，已幫你預填，檢查後按提交。兩件都做完，再到下面把方框打勾。</p>
   </div>
   <div class="card">
@@ -286,7 +287,7 @@
   </div>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.17 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.18 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -653,6 +654,7 @@ function renderApply(){
   var box=$('apply-fields'); box.innerHTML=''; $('form-days').innerHTML=''; daySeq=0;
   var ws=normHM(cfg&&cfg.work&&cfg.work.start,'09:00'), we=normHM(cfg&&cfg.work&&cfg.work.end,'18:00');
   var note=$('apply-note'); note.textContent='';
+  $('btn-ics').hidden=(kind!=='leave');
   if(kind==='leave'){
     var types=strList(cfg&&cfg.forms&&cfg.forms.leave&&cfg.forms.leave.types,['事假','病假','特別休假']).map(function(t){return {v:t,t:t};}).concat([{v:'__other__',t:'其他'}]);
     box.appendChild(field('ap-type','假別','select',types[0].v,types));
@@ -845,6 +847,28 @@ $('btn-form').addEventListener('click',function(){
   if(!openExternal(url)){ var n=$('apply-note'); n.innerHTML=''; n.appendChild(el('a',{href:url,target:'_blank',rel:'noopener',class:'btn primary block',text:'打開表單'})); }
 });
 $('apply-fields').addEventListener('input',function(){ $('form-days').innerHTML=''; });
+/* 請假加到行事曆：產生 .ics，每天一個行程，標成「外出」與私人，標題只寫「請假」。
+   時間用 UTC（台灣固定 +8、沒有夏令時間），就不必附時區定義；UID 固定，重複匯入同一天會更新而不是多一筆 */
+function icsStamp(iso,hm){ var d=new Date(iso+'T'+hm+':00+08:00'); return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,''); }
+function icsFor(d){
+  var now=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,''), L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//daka//leave//ZH-TW','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+  (d.days||[d]).forEach(function(x){
+    var full=isFullDay(x), ymd=x.date.replace(/-/g,'');
+    L.push('BEGIN:VEVENT','UID:daka-leave-'+ymd+(full?'':'-'+x.start.replace(':','')+x.end.replace(':',''))+'@daka','DTSTAMP:'+now);
+    if(full){ var nx=parseISO(x.date); nx.setDate(nx.getDate()+1); L.push('DTSTART;VALUE=DATE:'+ymd,'DTEND;VALUE=DATE:'+todayISO(nx).replace(/-/g,''),'X-MICROSOFT-CDO-ALLDAYEVENT:TRUE'); }
+    else L.push('DTSTART:'+icsStamp(x.date,x.start),'DTEND:'+icsStamp(x.date,x.end));
+    L.push('SUMMARY:請假','CLASS:PRIVATE','TRANSP:OPAQUE','STATUS:CONFIRMED','X-MICROSOFT-CDO-BUSYSTATUS:OOF','END:VEVENT');
+  });
+  L.push('END:VCALENDAR');
+  return L.join('\r\n')+'\r\n';
+}
+$('btn-ics').addEventListener('click',function(){
+  var d=applyData(), err=validate(d); if(err){ alert(err); return; }
+  var url=URL.createObjectURL(new Blob([icsFor(d)],{type:'text/calendar;charset=utf-8'}));
+  var a=el('a',{href:url,download:'leave-'+d.days[0].date.replace(/-/g,'')+'.ics'});
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); },60000);
+  var n=$('apply-note'); n.textContent='已產生行事曆檔：電腦版 Outlook 打開它就會加入；iPhone 會問要不要加到行事曆，選公司帳號的行事曆才會同步到 Outlook。日期改掉的那天，要到 Outlook 自己刪。';
+});
 /* 表單一次只能填一天：多天請假時每天一顆按鈕，各自預填那一天 */
 function renderFormDays(d){
   var box=$('form-days'); box.innerHTML='';
