@@ -1,0 +1,74 @@
+name: Inspect Google Form structure (read-only)
+
+# Fetches the public viewform page of one or more Google Forms and prints the
+# question titles, types, entry ids and options. It never submits anything.
+# Form URLs are passed as inputs and masked in the log; only the parsed
+# structure (no form ids) is printed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url1:
+        description: "Form URL 1 (viewform or forms.gle)"
+        required: true
+      label1:
+        description: "Label 1"
+        required: false
+        default: "form1"
+      url2:
+        description: "Form URL 2"
+        required: false
+        default: ""
+      label2:
+        description: "Label 2"
+        required: false
+        default: "form2"
+      url3:
+        description: "Form URL 3"
+        required: false
+        default: ""
+      label3:
+        description: "Label 3"
+        required: false
+        default: "form3"
+      url4:
+        description: "Form URL 4"
+        required: false
+        default: ""
+      label4:
+        description: "Label 4"
+        required: false
+        default: "form4"
+      key:
+        description: "Secret used to seal the whole output in the log (required)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Mask form URLs in the log
+        run: |
+          for u in "${{ inputs.url1 }}" "${{ inputs.url2 }}" "${{ inputs.url3 }}" "${{ inputs.url4 }}" "${{ inputs.key }}"; do
+            if [ -n "$u" ]; then echo "::add-mask::$u"; fi
+          done
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Inspect forms
+        env:
+          GFORM_URL_1: ${{ inputs.url1 }}
+          GFORM_LABEL_1: ${{ inputs.label1 }}
+          GFORM_URL_2: ${{ inputs.url2 }}
+          GFORM_LABEL_2: ${{ inputs.label2 }}
+          GFORM_URL_3: ${{ inputs.url3 }}
+          GFORM_LABEL_3: ${{ inputs.label3 }}
+          GFORM_URL_4: ${{ inputs.url4 }}
+          GFORM_LABEL_4: ${{ inputs.label4 }}
+          GFORM_SEAL_KEY: ${{ inputs.key }}
+        run: python -I .github/scripts/inspect_gform.py

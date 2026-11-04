@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>打卡</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="打卡">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#FCFCFA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141516" media="(prefers-color-scheme: dark)">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root{
+    --bg:#FCFCFA;--card:#FFFFFF;--ink:#1B1A18;--sub:#6E6A64;--faint:#8C8781;
+    --line:#E7E4DD;--line-strong:#D6D3CB;
+    --navy:#20374B;--navy-2:#2C4A63;--accent:#E7A93C;--safe:#3E7A55;--terra:#B4471F;--danger:#B23125;
+    --warn-bg:#FFF4D6;--warn-ink:#6B4E00;--ok-bg:#E6F2EA;--ok-ink:#1F5234;--err-bg:#F8E3E0;--err-ink:#7A1F17;
+    --link:#20374B;--holiday:#B4471F;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--bg:#141516;--card:#1E2022;--ink:#F1EFEA;--sub:#B5B0A8;--faint:#8C8781;--line:#2E3134;--line-strong:#3C4044;
+      --warn-bg:#3A2E0E;--warn-ink:#F3D38A;--ok-bg:#15301F;--ok-ink:#A9DCB9;--err-bg:#3B1A16;--err-ink:#F3B0A8;--danger:#F09B90;--link:#9DB2C4;--holiday:#F0A58A;--navy:#3F6A91;--navy-2:#4C7CA6;}
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",-apple-system,"PingFang TC",system-ui,sans-serif;font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;
+    padding:env(safe-area-inset-top) 0 calc(72px + env(safe-area-inset-bottom)) 0;min-height:100vh}
+  header{padding:14px max(16px,env(safe-area-inset-right)) 6px max(16px,env(safe-area-inset-left));display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  header h1{font-size:22px;font-weight:700;color:var(--link)}
+  header .date{font-size:14px;color:var(--sub)}
+  main{padding:0 max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left))}
+  section[hidden]{display:none}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+  .card h2{font-size:15px;font-weight:600;color:var(--sub);margin-bottom:8px}
+  .status{display:flex;gap:12px}
+  .status div{flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:var(--bg)}
+  .status .lbl{font-size:13px;color:var(--sub)}
+  .status .val{font-size:24px;font-weight:700;letter-spacing:.02em}
+  .status .val.empty{color:var(--faint);font-weight:500}
+  .seg{display:flex;border:1px solid var(--line-strong);border-radius:10px;overflow:hidden}
+  .seg button{flex:1;min-height:44px;padding:10px 4px;font:inherit;font-size:15px;background:transparent;color:var(--ink);border:0;border-right:1px solid var(--line-strong)}
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--navy);color:#fff}
+  .other-wrap{margin-top:8px}
+  input,select,textarea{font:inherit;font-size:17px;color:var(--ink);background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:10px 12px;width:100%}
+  select{-webkit-appearance:none;appearance:none;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M3 6l5 5 5-5' fill='none' stroke='%238C8781' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+  textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:16px;line-height:1.3}
+  label.f{display:block;margin:10px 0 0}
+  label.f span{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  .row{display:flex;gap:10px}
+  .row>*{flex:1;min-width:0}
+  .big{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 6px}
+  .big button{font:inherit;font-size:26px;font-weight:700;color:#fff;border:0;border-radius:16px;padding:26px 8px;letter-spacing:.06em;-webkit-tap-highlight-color:transparent}
+  .big .in{background:var(--safe)} .big .out{background:var(--navy)}
+  .big button:disabled{opacity:.45}
+  .btn{display:inline-block;font:inherit;font-size:16px;font-weight:600;color:var(--link);background:transparent;border:1px solid var(--line-strong);border-radius:10px;min-height:44px;padding:10px 14px;text-align:center;text-decoration:none;-webkit-tap-highlight-color:transparent}
+  .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .btn.danger{color:var(--danger);border-color:var(--danger)}
+  .btn.block{display:block;width:100%;margin-top:10px}
+  .btn:disabled{opacity:.45}
+  .small{font-size:13px;color:var(--sub)}
+  .small.err{color:var(--danger);font-weight:600}
+  .banner{border-radius:10px;padding:10px 12px;font-size:14px;margin:10px 0}
+  .banner.warn{background:var(--warn-bg);color:var(--warn-ink)}
+  .banner.ok{background:var(--ok-bg);color:var(--ok-ink)}
+  .banner.err{background:var(--err-bg);color:var(--err-ink)}
+  iframe.gf{width:100%;height:340px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-top:8px}
+  .list{list-style:none}
+  .list li{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+  .list li:first-child{border-top:0}
+  .list .t{flex:1;min-width:0}
+  .list .t b{font-weight:600}
+  .list .x{font:inherit;font-size:14px;color:var(--danger);background:transparent;border:0;min-height:44px;padding:10px 12px}
+  .tag{display:inline-block;font-size:12px;padding:1px 6px;border-radius:6px;background:var(--warn-bg);color:var(--warn-ink);margin-left:6px;vertical-align:middle}
+  .chk{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--sub);min-height:44px}
+  .chk input{width:22px;height:22px;flex:0 0 auto}
+  nav.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  body.typing nav.tabs{display:none}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 6px}
+  .chip{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:999px;min-height:36px;padding:6px 14px;-webkit-tap-highlight-color:transparent}
+  .chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .hint{display:block;font-size:13px;color:var(--sub);margin-top:4px;min-height:18px}
+  .hint.err{color:var(--danger);font-weight:600}
+  .sync-ok{color:var(--safe)}
+  .date-row{display:flex;gap:8px}
+  .date-row input{flex:1;min-width:0}
+  .icon-btn{flex:none;width:48px;min-height:44px;display:flex;align-items:center;justify-content:center;color:var(--link);background:var(--card);border:1px solid var(--line-strong);border-radius:10px;-webkit-tap-highlight-color:transparent}
+  .icon-btn[aria-expanded="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .icon-btn svg{width:22px;height:22px}
+  .cal{margin-top:8px;padding:6px 8px 8px;background:var(--card);border:1px solid var(--line-strong);border-radius:12px}
+  .cal-head{display:flex;align-items:center;justify-content:space-between}
+  .cal-head b{font-size:16px}
+  .cal-nav{width:44px;height:44px;font:inherit;font-size:22px;line-height:1;color:var(--link);background:transparent;border:0;border-radius:10px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+  .cal-wd{font-size:13px;color:var(--sub);padding:2px 0 4px}
+  .cal-wd.off{color:var(--holiday)}
+  .cal-d{position:relative;min-height:42px;font:inherit;font-size:16px;color:var(--ink);background:transparent;border:0;border-radius:10px;-webkit-tap-highlight-color:transparent}
+  .cal-d.off{color:var(--holiday)}
+  .cal-d.hol::after{content:"";position:absolute;left:50%;bottom:5px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:currentColor}
+  .cal-d.today{box-shadow:inset 0 0 0 1.5px var(--navy)}
+  .cal-d.sel{background:var(--navy);color:#fff}
+  .cal-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font-size:13px;color:var(--sub)}
+  .cal-foot button{font:inherit;font-size:14px;color:var(--link);background:transparent;border:0;min-height:44px;padding:0 6px}
+  .sub-h{font-size:15px;font-weight:700;margin:16px 0 2px}
+  .off-year{font-size:13px;font-weight:700;color:var(--sub);margin:10px 0 0}
+  .off-list li{display:flex;align-items:center;gap:8px;min-height:44px;border-top:1px solid var(--line);list-style:none}
+  .off-list .d{flex:none;width:6.6em;font-variant-numeric:tabular-nums}
+  .off-list .n{flex:1;min-width:0;font-size:14px;color:var(--sub)}
+  .off-list .x{flex:none;width:44px;height:44px;font:inherit;font-size:18px;color:var(--sub);background:transparent;border:0}
+  .day{border-top:1px solid var(--line);margin-top:14px;padding-top:4px}
+  .day-head{display:flex;justify-content:space-between;align-items:center;min-height:44px}
+  .day-head b{font-size:15px}
+  .day-x{font:inherit;font-size:14px;color:var(--danger);background:transparent;border:0;min-height:44px;padding:10px 4px}
+  .req-head{font:inherit;color:var(--ink);background:transparent;border:0;padding:6px 0;text-align:left;width:100%;min-height:44px;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:4px}
+  @media (min-width:720px){
+    header,main{max-width:640px;margin-left:auto;margin-right:auto}
+    nav.tabs{max-width:640px;left:50%;right:auto;width:100%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0}
+  }
+  nav.tabs button{flex:1;font:inherit;font-size:14px;color:var(--sub);background:transparent;border:0;padding:12px 4px 10px;-webkit-tap-highlight-color:transparent}
+  nav.tabs button.on{color:var(--link);font-weight:700}
+  .muted{color:var(--sub)}
+  details summary{cursor:pointer;color:var(--link);font-weight:600;font-size:15px;min-height:44px;display:flex;align-items:center}
+  details p,details li{font-size:14px;color:var(--sub);margin:6px 0}
+  details ol{padding-left:20px}
+</style>
+</head>
+<body>
+<header><h1>打卡</h1><span class="date" id="hdr-date"></span></header>
+<main>
+<div id="banner-safari" class="banner warn" hidden><span id="banner-inapp" hidden>這一頁是從 LINE 或其他 App 裡點開的，請先按右上角的「⋯」或分享鈕，選「用 Safari 開啟」。</span>到了 Safari 之後，按下方的「分享」，選「加入主畫面」，之後從主畫面的「打卡」圖示打開再貼設定碼。在 Safari 裡貼的設定和打卡紀錄不會帶進主畫面的 App。</div>
+
+<!-- ───────── 打卡 ───────── -->
+<section id="tab-punch">
+  <div id="banner-config" class="banner warn" hidden>還沒有設定表單。請到「設定」貼上設定碼。</div>
+  <div id="banner-month" class="banner warn" hidden></div>
+  <div id="banner-pending" class="banner warn" hidden></div>
+  <div class="card">
+    <h2>今天</h2>
+    <div class="status">
+      <div><div class="lbl">上班</div><div class="val empty" id="st-in">—</div></div>
+      <div><div class="lbl">下班</div><div class="val empty" id="st-out">—</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>打卡地點</h2>
+    <div class="seg" id="seg-place"></div>
+    <div class="other-wrap" id="other-wrap" hidden>
+      <input id="place-other" type="text" placeholder="例如：客戶公司、研討會地點" autocomplete="off">
+    </div>
+    <div class="big">
+      <button class="in" id="btn-in">上班</button>
+      <button class="out" id="btn-out">下班</button>
+    </div>
+    <button class="btn block" id="btn-trip">上班時間公出</button>
+  </div>
+  <div class="card" id="result-card" hidden>
+    <h2 id="result-title">已送出</h2>
+    <div id="result-body" class="small"></div>
+    <div id="result-err" class="banner err" hidden></div>
+    <div id="result-frame"></div>
+    <button class="btn primary block" id="btn-confirm" hidden>我已在 Safari 按了提交</button>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="btn-open-form">改用表單網頁重打這筆</button>
+      <button class="btn danger" id="btn-undo">沒成功？刪除這筆</button>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── 申請 ───────── -->
+<section id="tab-apply" hidden>
+  <div class="card">
+    <h2>申請類型</h2>
+    <div class="seg" id="seg-kind">
+      <button data-kind="leave" class="on" aria-pressed="true">請假</button>
+      <button data-kind="overtime" aria-pressed="false">加班</button>
+      <button data-kind="travel" aria-pressed="false">差旅</button>
+    </div>
+    <div id="apply-fields"></div>
+    <div id="apply-note" class="small" style="margin-top:10px"></div>
+    <button class="btn primary block" id="btn-mail">① 寫信給主管</button>
+    <button class="btn block" id="btn-copy-mail">複製信件內容</button>
+    <p class="small" id="sender-hint" style="margin-top:6px" hidden></p>
+    <button class="btn block" id="btn-form">② 開啟表單</button>
+    <div id="form-days"></div>
+    <p class="small" style="margin-top:8px">信會在你的郵件 App 打開，看一眼再按傳送；打不開或開錯信箱時，用「複製信件內容」貼到 Outlook。表單會在 Safari 打開，已幫你預填，檢查後按提交。兩件都做完，再到下面把方框打勾。</p>
+  </div>
+  <div class="card">
+    <h2>最近的申請</h2>
+    <ul class="list" id="req-list"></ul>
+    <p class="small muted" id="req-empty">還沒有申請。</p>
+  </div>
+</section>
+
+<!-- ───────── 紀錄 ───────── -->
+<section id="tab-log" hidden>
+  <div class="card">
+    <h2>打卡紀錄（只存在這支手機）</h2>
+    <ul class="list" id="log-list"></ul>
+    <p class="small muted" id="log-empty">還沒有紀錄。</p>
+    <button class="btn block" id="btn-csv">複製成 CSV</button>
+  </div>
+</section>
+
+<!-- ───────── 設定 ───────── -->
+<section id="tab-settings" hidden>
+  <div class="card">
+    <h2>設定碼</h2>
+    <textarea id="setup-code" placeholder="把設定碼貼在這裡，再按「套用」" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button class="btn primary" id="btn-apply-code">套用</button>
+      <button class="btn" id="btn-export-code">匯出目前設定</button>
+    </div>
+    <div id="code-msg" class="small" style="margin-top:8px" role="status" aria-live="polite"></div>
+  </div>
+  <div class="card">
+    <h2>我與公司</h2>
+    <label class="f"><span>我的全名（信件主旨用，例如：王小明）</span><input id="cfg-fullname" type="text" autocomplete="name"></label>
+    <label class="f"><span>信件署名（例如：小明）</span><input id="cfg-name" type="text"></label>
+    <label class="f"><span>我的公司信箱（寄件者，只用來提醒）</span><input id="cfg-sender" type="email" autocomplete="email" inputmode="email"></label>
+    <label class="f"><span>主管稱呼（例如：王經理）</span><input id="cfg-sup-title" type="text"></label>
+    <label class="f"><span>主管 Email</span><input id="cfg-sup-email" type="email" autocomplete="off" inputmode="email"></label>
+    <label class="f"><span>HR 稱呼（例如：人資）</span><input id="cfg-hr-name" type="text"></label>
+    <label class="f"><span>HR Email</span><input id="cfg-hr-email" type="email" autocomplete="off" inputmode="email"></label>
+    <label class="chk" style="margin-top:6px"><input id="cfg-cc-hr" type="checkbox"> 寄給主管時副本 HR（先問過 HR 再勾）</label>
+    <label class="f"><span>上班時間</span><input id="cfg-work-start" type="time"></label>
+    <label class="f"><span>下班時間</span><input id="cfg-work-end" type="time"></label>
+  </div>
+  <div class="card">
+    <h2>跨裝置同步（用你自己的 Google 試算表）</h2>
+    <label class="f"><span>同步網址（Apps Script 部署後的網址，結尾是 /exec）</span><input id="cfg-sync-url" type="url" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <label class="f"><span>同步密碼</span><input id="cfg-sync-token" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <button class="btn block" id="btn-sync-now">立即同步</button>
+    <p class="small" id="sync-status" style="margin-top:8px">尚未設定同步。</p>
+  </div>
+  <div class="card">
+    <h2>打卡表單</h2>
+    <label class="f"><span>表單網址（每月換表單時貼新的）</span><input id="cfg-clockin-url" type="url" autocomplete="off"></label>
+    <label class="f"><span>表單說明（例如：10月出席紀錄）</span><input id="cfg-clockin-desc" type="text"></label>
+    <label class="f"><span>打卡的送出方式</span>
+      <select id="cfg-submit-mode">
+        <option value="iframe">直接送出，確認畫面顯示在下方</option>
+        <option value="tab">在 Safari 開已預填的表單，自己按提交</option>
+      </select></label>
+    <p class="small" style="margin-top:8px">沒有網路時，送出後下方會一片空白，那筆並沒有送到 Google。有網路卻一直空白，才改成「在 Safari 開已預填的表單」。</p>
+    <button class="btn block" id="btn-test-open">用表單網頁試開一次（不會送出）</button>
+  </div>
+  <div class="card">
+    <h2>忘記打卡提醒（iPhone 捷徑）</h2>
+    <p class="small">捷徑每天在固定時間問同步試算表「今天打卡了沒」，沒打才跳通知。週末、下面的放假日、申請頁送出的請假時段都會自動跳過。</p>
+    <div id="remind-box"></div>
+    <h3 class="sub-h">不用提醒的日子</h3>
+    <p class="small">已內建 2026–2027 國定假日。公司另外放假的日子在這裡加入。</p>
+    <div id="off-add"></div>
+    <div id="off-list"></div>
+    <details>
+      <summary>捷徑設定步驟</summary>
+      <p><b>先做兩個捷徑</b>（「捷徑」App 下方的「捷徑」分頁）：</p>
+      <ol>
+        <li>右上角「＋」，命名「上班檢查」。</li>
+        <li>加入「取得 URL 的內容」，貼上「上班檢查網址」。</li>
+        <li>加入「如果」，條件設成「URL 的內容」「包含」「還沒」。</li>
+        <li>加入「顯示通知」，拖到「如果」和「否則」中間，內容選「URL 的內容」。</li>
+        <li>照樣再做一個「下班檢查」，網址換成「下班檢查網址」。</li>
+      </ol>
+      <p><b>再做自動化</b>（「自動化」分頁，每個時間一個）：</p>
+      <ol>
+        <li>「＋」→「特定時間」，設時間；重複選「每週」，只勾星期一到五；選「立即執行」。</li>
+        <li>只加一個動作「執行捷徑」，選「上班檢查」或「下班檢查」。</li>
+        <li>上班：08:30、08:45、09:00、09:15、09:30；下班：17:30、17:45、18:00、18:15、18:30。</li>
+      </ol>
+      <p>打過卡之後的檢查都不會跳通知。下班檢查會看你今天幾點打上班卡，做滿工時（上班到下班的時數）之前不提醒。</p>
+      <p>想先試試看：把檢查網址貼到 Safari 打開，會看到「還沒打上班卡！」或「今天已打上班卡」。</p>
+    </details>
+  </div>
+  <div class="card">
+    <details>
+      <summary>每個月換表單怎麼辦</summary>
+      <p>HR 給新連結時，先在 Safari 打開它，複製網址列裡 docs.google.com 開頭的完整網址，貼到上面的「表單網址」，說明改成新的月份。然後按上面的「用表單網頁試開一次」，看到「上班」和地點已經選好，代表題目代號沒變，關掉表單就好，不要按提交。</p>
+      <p>如果打開後選項沒有預選，代號變了，把新連結貼給 Claude 重新產生設定碼。</p>
+    </details>
+  </div>
+  <div class="card">
+    <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
+    <p class="small muted" style="margin-top:8px">版本 1.12 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+  </div>
+</section>
+</main>
+
+<nav class="tabs">
+  <button data-tab="punch" class="on" aria-current="page">打卡</button>
+  <button data-tab="apply">申請</button>
+  <button data-tab="log">紀錄</button>
+  <button data-tab="settings">設定</button>
+</nav>
+
+<form id="gform" method="POST" target="gf" hidden accept-charset="UTF-8"></form>
+
+<script>
+(function(){
+'use strict';
+/* ───────── 儲存 ───────── */
+var KEY_CFG='daka.config', KEY_LOG='daka.log', KEY_REQ='daka.requests', KEY_PREF='daka.prefs', KEY_FREQ='daka.freq', KEY_SYNC='daka.sync';
+function load(k,def){ try{ var v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch(e){ return def; } }
+function save(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ alert('無法儲存：'+e.message); } }
+var cfg=load(KEY_CFG,null), log=load(KEY_LOG,[]), reqs=load(KEY_REQ,[]), prefs={place:'',other:''};
+try{ localStorage.removeItem(KEY_PREF); }catch(e){}
+var freq=load(KEY_FREQ,{}), syncState=load(KEY_SYNC,{});
+if(!freq||typeof freq!=='object') freq={}; if(!syncState||typeof syncState!=='object') syncState={};
+if(!Array.isArray(log)) log=[]; if(!Array.isArray(reqs)) reqs=[];
+
+/* ───────── 工具 ───────── */
+function $(id){ return document.getElementById(id); }
+function el(tag,attrs,children){
+  var e=document.createElement(tag);
+  if(attrs) Object.keys(attrs).forEach(function(k){
+    if(k==='text') e.textContent=attrs[k];
+    else if(k==='class') e.className=attrs[k];
+    else e.setAttribute(k,attrs[k]);
+  });
+  (children||[]).forEach(function(c){ e.appendChild(typeof c==='string'?document.createTextNode(c):c); });
+  return e;
+}
+function pad(n){ return (n<10?'0':'')+n; }
+function todayISO(d){ d=d||new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function nowHM(d){ d=d||new Date(); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+var WD=['日','一','二','三','四','五','六'];
+function parseISO(iso){ var p=(iso||'').split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+function fmtMD(iso){ var p=iso.split('-'); return (+p[1])+'/'+(+p[2])+'（'+WD[parseISO(iso).getDay()]+'）'; }
+function fmtDW(iso){ var p=iso.split('-'); return (+p[1])+'/'+(+p[2])+'('+WD[parseISO(iso).getDay()]+')'; }
+function fmtDot(iso){ var p=iso.split('-'); return p[0]+'.'+p[1]+'.'+p[2]; }
+function fmtDateLong(d){ return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' 週'+WD[d.getDay()]; }
+function hhmm(t){ return (t||'').replace(':',''); }
+function toMin(hm){ var p=(hm||'0:0').split(':'); return (+p[0])*60+(+p[1]); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function b64enc(s){ return btoa(unescape(encodeURIComponent(s))); }
+function b64dec(s){ return decodeURIComponent(escape(atob(s.replace(/\s+/g,'')))); }
+function isFormURL(u){ return /^https:\/\/docs\.google\.com\/forms\/(u\/\d+\/)?d\/e\/[\w-]+\/viewform(?:[?#]|$)/.test(u||''); }
+function cleanURL(u){ return String(u||'').split(/[?#]/)[0]; }
+function normHM(x,def){ var m=/^(\d{1,2}):(\d{2})$/.exec(x||''); return m?pad(+m[1])+':'+m[2]:def; }
+function asObj(x){ return (x&&typeof x==='object'&&!Array.isArray(x))?x:{}; }
+function openExternal(url){ var w=null; try{ w=window.open(url,'_blank'); if(w) w.opener=null; }catch(e){} return !!w; }
+function openLink(holder,url,label){ holder.innerHTML=''; holder.appendChild(el('a',{href:url,target:'_blank',rel:'noopener',class:'btn primary block',text:label})); }
+function isEntry(x){ return /^entry\.\d+$/.test(x||''); }
+var REQUIRED_ENTRIES={clockin:['reason','place'],leave:['type','date','start','end','reason'],overtime:['date','start','end','reason','comp'],travel:[]};
+function formComplete(name,f){ return !!f&&isFormURL(f.url)&&(REQUIRED_ENTRIES[name]||[]).every(function(k){ return isEntry(f[k]); }); }
+function hasForm(name){ return formComplete(name, cfg&&cfg.forms&&cfg.forms[name]); }
+function responseURL(viewUrl){ return viewUrl.replace(/\/viewform.*$/,'/formResponse'); }
+function fbzx(){ var s='-'; for(var i=0;i<19;i++){ s+=(i===0?1+Math.floor(Math.random()*9):Math.floor(Math.random()*10)); } return s; }
+function qs(obj){ return Object.keys(obj).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(obj[k]); }).join('&'); }
+function toast(msg,kind){ var b=$('code-msg'); b.textContent=msg; b.className='small '+(kind||''); }
+function strList(raw,fallback){ var l=Array.isArray(raw)?raw.filter(function(x){ return typeof x==='string'&&x.trim(); }):[]; return l.length?l:fallback; }
+var inSafari=(navigator.standalone===false);
+var inAppBrowser=inSafari&&/\bLine\/|FBAN|FBAV|Messenger|Instagram|GSA\/|MicroMessenger/i.test(navigator.userAgent);
+
+/* ───────── 分頁 ───────── */
+var tabs=document.querySelectorAll('nav.tabs button');
+function showTab(name){
+  tabs.forEach(function(b){ var on=b.getAttribute('data-tab')===name; b.classList.toggle('on',on); if(on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+  ['punch','apply','log','settings'].forEach(function(t){ $('tab-'+t).hidden=(t!==name); });
+  if(name==='log') renderLog(); if(name==='apply') renderReqs(); if(name==='settings') renderSettings();
+  window.scrollTo(0,0);
+}
+tabs.forEach(function(b){ b.addEventListener('click',function(){ showTab(b.getAttribute('data-tab')); }); });
+
+/* ───────── 打卡 ───────── */
+var DEFAULT_PLACES=['辦公室','自宅'];
+function renderPlaces(){
+  var seg=$('seg-place'); seg.innerHTML='';
+  var ci=cfg&&cfg.forms&&cfg.forms.clockin;
+  var list=strList(ci&&ci.places, DEFAULT_PLACES).filter(function(p){ return p!=='其他'; });
+  if(!ci||ci.placeOther!==false) list=list.concat(['其他']);
+  if(list.indexOf(prefs.place)<0) prefs.place=list[0];
+  list.forEach(function(p){
+    var b=el('button',{type:'button',text:p,'aria-pressed':prefs.place===p?'true':'false'});
+    if(prefs.place===p) b.classList.add('on');
+    b.addEventListener('click',function(){ prefs.place=p; renderPlaces(); });
+    seg.appendChild(b);
+  });
+  $('other-wrap').hidden=(prefs.place!=='其他');
+  $('place-other').value=prefs.other||'';
+}
+$('place-other').addEventListener('input',function(){ prefs.other=this.value; });
+/* 地點不記憶：每次打開 App、跨日、打完卡都回到第一個地點（辦公室） */
+function resetPlace(){ prefs.place=''; prefs.other=''; renderPlaces(); }
+
+function liveLog(){ return log.filter(function(r){ return !r.deleted; }); }
+function nowMs(){ return Date.now(); }
+function saveLog(){ save(KEY_LOG,log); scheduleSync(); }
+function removeEntry(id){ log.forEach(function(r){ if(r.id===id){ r.deleted=true; r.updatedAt=nowMs(); } }); saveLog(); }
+function todayEntries(){ var t=todayISO(); return liveLog().filter(function(r){ return r.date===t; }); }
+function renderHeader(){ $('hdr-date').textContent=fmtDateLong(new Date()); }
+function renderStatus(){
+  var t=todayEntries(), ins=t.filter(function(r){return r.type==='in';}), outs=t.filter(function(r){return r.type==='out';});
+  var si=$('st-in'), so=$('st-out');
+  si.textContent=ins.length?ins[ins.length-1].time:'—'; si.className='val'+(ins.length?'':' empty');
+  so.textContent=outs.length?outs[outs.length-1].time:'—'; so.className='val'+(outs.length?'':' empty');
+  $('banner-config').hidden=hasForm('clockin');
+  var bm=$('banner-month'); bm.hidden=true;
+  if(hasForm('clockin')&&cfg.forms.clockin.desc){
+    var m=/(\d{1,2})\s*月/.exec(cfg.forms.clockin.desc);
+    if(m&&(+m[1])!==(new Date().getMonth()+1)){ bm.textContent='設定裡的打卡表單是「'+cfg.forms.clockin.desc+'」，現在是 '+(new Date().getMonth()+1)+' 月，可能要向 HR 要新連結。'; bm.hidden=false; }
+  }
+  var bp=$('banner-pending'); bp.hidden=true;
+  var open=liveLog().filter(function(r){ return r.status==='pending'||r.status==='unconfirmed'; });
+  if(open.length&&$('result-card').hidden){
+    var o=open[open.length-1];
+    bp.textContent='';
+    bp.appendChild(document.createTextNode((o.status==='pending'?'有一筆還沒收到 Google 回應：':'有一筆還沒確認提交：')+o.date+' '+o.time+' '+(TYPE_LABEL[o.type]||o.type)+'。到「紀錄」按「已提交」或「刪除」。 '));
+    bp.hidden=false;
+  }
+}
+
+var TYPE_LABEL={in:'上班',out:'下班',trip:'上班時間公出'};
+var lockUntil=0, lastEntryId=null, lastType=null, lastPlace=null, waitTimer=null;
+function setStatus(id,st){ log.forEach(function(r){ if(r.id===id){ r.status=st; r.updatedAt=nowMs(); } }); saveLog(); }
+function showErr(msg){ var e=$('result-err'); e.textContent=msg; e.hidden=false; }
+function placeValue(){ return prefs.place==='其他'?('其他:'+(prefs.other||'').trim()):prefs.place; }
+function prefillURL(type,pl){
+  var f=cfg.forms.clockin, p={usp:'pp_url'}; pl=pl||prefs;
+  p[f.reason]=TYPE_LABEL[type]||'上班';
+  if(pl.place==='其他'){ p[f.place]='__other_option__'; p[f.place+'.other_option_response']=(pl.other||'').trim(); } else p[f.place]=pl.place;
+  return f.url+'?'+qs(p);
+}
+function setLocked(on){ ['btn-in','btn-out','btn-trip'].forEach(function(id){ $(id).disabled=on; }); }
+function punch(type){
+  if(Date.now()<lockUntil) return;
+  if(!hasForm('clockin')){ showTab('settings'); toast('請先貼上設定碼','err'); return; }
+  if(navigator.onLine===false){ alert('目前沒有網路，這筆不會送到 Google。請連上網路後再打卡。'); return; }
+  if(prefs.place==='其他'&&!(prefs.other||'').trim()){ alert('請先填打卡地點'); $('place-other').focus(); return; }
+  var same=todayEntries().filter(function(r){ return r.type===type; });
+  if(same.length&&!confirm('今天 '+same[same.length-1].time+' 已打過「'+TYPE_LABEL[type]+'」卡，要再送一次嗎？')) return;
+  var f=cfg.forms.clockin, now=new Date(), mode=(cfg.submitMode==='tab'?'tab':'iframe');
+  var holder=$('result-frame'); holder.innerHTML='';
+  var body=$('result-body'); body.textContent='';
+  clearTimeout(waitTimer); $('result-err').hidden=true; $('btn-confirm').hidden=true;
+  var entry={id:uid(),ts:now.toISOString(),date:todayISO(now),time:nowHM(now),type:type,place:placeValue(),status:(mode==='iframe'?'pending':'unconfirmed')};
+  entry.updatedAt=nowMs(); entry.device=deviceLabel();
+  log.push(entry); saveLog(); lastEntryId=entry.id; lastType=type; lastPlace={place:prefs.place,other:prefs.other};
+  lockUntil=Date.now()+8000; setLocked(true); setTimeout(function(){ setLocked(false); },8000);
+  if(mode==='iframe'){
+    var fields={}, token=fbzx();
+    fields[f.reason]=TYPE_LABEL[type];
+    if(prefs.place==='其他'){ fields[f.place]='__other_option__'; fields[f.place+'.other_option_response']=(prefs.other||'').trim(); }
+    else fields[f.place]=prefs.place;
+    fields.fvv='1'; fields.pageHistory='0'; fields.fbzx=token; fields.partialResponse='[null,null,"'+token+'"]';
+    var form=$('gform'); form.innerHTML=''; form.action=responseURL(f.url)+'?embedded=true'; form.target='gf';
+    Object.keys(fields).forEach(function(k){ form.appendChild(el('input',{type:'hidden',name:k,value:fields[k]})); });
+    var fr=el('iframe',{name:'gf',class:'gf',title:'Google 表單回應'}), firstLoad=true, myId=entry.id;
+    waitTimer=setTimeout(function(){ showErr('15 秒內沒有收到 Google 的畫面，可能沒有網路。這筆大概沒送到：請按「沒成功？刪除這筆」，連上網路後再打一次。'); },15000);
+    fr.addEventListener('load',function(){ if(firstLoad){ firstLoad=false; return; } clearTimeout(waitTimer); setStatus(myId,'sent'); $('result-err').hidden=true; });
+    holder.appendChild(fr);
+    form.submit();
+    try{ fetch('https://docs.google.com/favicon.ico?'+Date.now(),{mode:'no-cors',cache:'no-store'}).then(null,function(){ clearTimeout(waitTimer); showErr('連不上 Google，這筆沒有送到。請按「沒成功？刪除這筆」，網路正常後再打一次。'); }); }catch(e){}
+    $('result-title').textContent='已送出 '+TYPE_LABEL[type]+' '+entry.time;
+    body.textContent='地點：'+entry.place+'。下面是 Google 的畫面，看到 Google 說已收到回覆（例如「我們已經收到你回覆的表單」）才算完成。如果下面是空白，或又出現整張表單、有紅字，代表沒送到 Google：按「沒成功？刪除這筆」，再用「改用表單網頁重打這筆」。';
+  } else {
+    var url=prefillURL(type,lastPlace), opened=openExternal(url);
+    $('result-title').textContent='已開啟 '+TYPE_LABEL[type]+' '+entry.time;
+    if(opened) body.textContent='地點：'+entry.place+'。表單已在 Safari 打開並預選好，請按「提交」。看到「已收到回覆」後，回來按下面的按鈕。';
+    else { body.textContent='地點：'+entry.place+'。請按下面的「打開表單」，在 Safari 按「提交」，看到「已收到回覆」後回來按「我已在 Safari 按了提交」。'; openLink(holder,url,'打開表單'); }
+    $('btn-confirm').hidden=false;
+  }
+  $('result-card').hidden=false; renderStatus(); resetPlace();
+  $('result-card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('btn-in').addEventListener('click',function(){ punch('in'); });
+$('btn-out').addEventListener('click',function(){ punch('out'); });
+$('btn-trip').addEventListener('click',function(){ punch('trip'); });
+$('btn-confirm').addEventListener('click',function(){
+  setStatus(lastEntryId,'confirmed');
+  $('btn-confirm').hidden=true; $('result-title').textContent='已完成 '+TYPE_LABEL[lastType]; $('result-body').textContent='已記錄為完成。'; $('result-frame').innerHTML=''; renderStatus();
+});
+$('btn-undo').addEventListener('click',function(){
+  if(!lastEntryId) return;
+  if(!confirm('刪除剛才這筆本機紀錄？（Google 那邊如果已經收到，不會被刪掉）')) return;
+  removeEntry(lastEntryId); lastEntryId=null;
+  clearTimeout(waitTimer); lockUntil=0; setLocked(false); $('result-card').hidden=true; $('result-frame').innerHTML=''; renderStatus();
+});
+$('btn-open-form').addEventListener('click',function(){
+  if(!hasForm('clockin')) return;
+  var url=prefillURL(lastType||'in',lastPlace);
+  if(!openExternal(url)) openLink($('result-frame'),url,'打開表單');
+});
+$('btn-test-open').addEventListener('click',function(){
+  if(!hasForm('clockin')){ toast('請先貼上設定碼','err'); return; }
+  if(!openExternal(prefillURL('in'))) toast('無法自動開啟，請改用「打卡」分頁的「改用表單網頁重打這筆」','err');
+});
+
+/* 回到前景、跨日時重新整理畫面 */
+var shownDay=todayISO();
+function refresh(ev){
+  if(document.hidden) return;
+  renderHeader();
+  var t=todayISO();
+  if(t!==shownDay){
+    ['ap-date','ap-end-date'].forEach(function(id){ var e=$(id); if(e&&parseDateInput(e.value)===shownDay){ e.value=mmdd(t); e.dispatchEvent(new Event('input')); } });
+    var cur=liveLog().filter(function(r){ return r.id===lastEntryId; })[0];
+    if(!(cur&&(cur.status==='unconfirmed'||cur.status==='pending'))){ clearTimeout(waitTimer); $('result-card').hidden=true; $('result-frame').innerHTML=''; lastEntryId=null; }
+    shownDay=t; resetPlace();
+  }
+  renderStatus();
+  syncNow(false, !!(ev&&ev.type));
+}
+if(window.visualViewport){ window.visualViewport.addEventListener('resize',function(){ document.body.classList.toggle('typing', window.visualViewport.height<window.innerHeight*0.75); }); }
+document.addEventListener('visibilitychange',refresh);
+window.addEventListener('pageshow',refresh);
+window.addEventListener('focus',refresh);
+setInterval(refresh,60000);
+
+/* ───────── 申請 ───────── */
+var kind='leave';
+document.querySelectorAll('#seg-kind button').forEach(function(b){
+  b.addEventListener('click',function(){
+    kind=b.getAttribute('data-kind');
+    document.querySelectorAll('#seg-kind button').forEach(function(x){ var on=(x===b); x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
+    renderApply();
+  });
+});
+function field(id,label,type,value,extra){
+  var inp=el(type==='select'?'select':'input', type==='select'?{id:id}:{id:id,type:type,value:value||''});
+  if(type==='select'){ (extra||[]).forEach(function(o){ inp.appendChild(el('option',{value:o.v,text:o.t})); }); if(value) inp.value=value; }
+  if(type==='text'&&extra&&extra.placeholder) inp.setAttribute('placeholder',extra.placeholder);
+  return el('label',{class:'f'},[el('span',{text:label}),inp]);
+}
+function addHours(hm,h){ var p=hm.split(':'); var d=new Date(2000,0,1,+p[0],+p[1]); d.setMinutes(d.getMinutes()+h*60); return nowHM(d); }
+/* 時間：四位數 24 小時制，1630 = 16:30，0400 = 04:00，930 = 09:30 */
+function parseTimeInput(v){
+  v=String(v||'').trim().replace(/[：.]/g,':');
+  var m=/^(\d{1,2}):(\d{2})$/.exec(v);
+  if(!m){ var dgt=v.replace(/\D/g,''); if(dgt.length===3||dgt.length===4) m=[null,dgt.slice(0,dgt.length-2),dgt.slice(-2)]; else if(dgt.length>=1&&dgt.length<=2) m=[null,dgt,'00']; }
+  if(!m) return '';
+  var h=+m[1], mi=+m[2]; if(h>23||mi>59) return '';
+  return pad(h)+':'+pad(mi);
+}
+function zhTime(hm){ var p=hm.split(':'), h=+p[0], mi=p[1]; var tag=h<5?'凌晨':h<12?'上午':h===12?'中午':h<18?'下午':'晚上'; var h12=h%12===0?12:h%12; return tag+' '+h12+':'+mi; }
+/* 日期：1020 = 今年 10/20；比今天早超過 60 天就算明年 */
+function mmdd(iso){ var p=iso.split('-'); return p[1]+p[2]; }
+function parseDateInput(v){
+  var dgt=String(v||'').replace(/\D/g,''), y, mo, da, now=new Date();
+  if(dgt.length===8){ y=+dgt.slice(0,4); mo=+dgt.slice(4,6); da=+dgt.slice(6); }
+  else if(dgt.length===4||dgt.length===3){ mo=+dgt.slice(0,dgt.length-2); da=+dgt.slice(-2); y=now.getFullYear(); }
+  else return '';
+  if(mo<1||mo>12||da<1) return '';
+  var d=new Date(y,mo-1,da); if(d.getMonth()!==mo-1) return '';
+  if(dgt.length!==8){ var today=new Date(now.getFullYear(),now.getMonth(),now.getDate()); if((today-d)/86400000>60) d=new Date(y+1,mo-1,da); }
+  return todayISO(d);
+}
+function chipOrder(key,defaults){
+  var cnt=freq[key]||{}, seen={}, list=[];
+  Object.keys(cnt).concat(defaults).forEach(function(t){ if(!seen[t]&&/^\d\d:\d\d$/.test(t)){ seen[t]=1; list.push(t); } });
+  return list.sort(function(a,b){ return (cnt[b]||0)-(cnt[a]||0)||defaults.indexOf(a)-defaults.indexOf(b); }).slice(0,4);
+}
+function bumpFreq(key,hm){ if(!hm) return; freq[key]=freq[key]||{}; freq[key][hm]=(freq[key][hm]||0)+1; save(KEY_FREQ,freq); }
+function timeField(id,label,key,value,defaults){
+  var inp=el('input',{id:id,type:'text',inputmode:'numeric',autocomplete:'off',placeholder:'例如 0930',value:value||''});
+  var hint=el('span',{class:'hint'}), chips=el('div',{class:'chips'});
+  function upd(){ var v=parseTimeInput(inp.value); hint.textContent=inp.value?(v?zhTime(v):'請輸入四位數，例如 0930 或 1630'):''; hint.className='hint'+(inp.value&&!v?' err':''); chips.querySelectorAll('.chip').forEach(function(c){ c.classList.toggle('on',c.textContent===v); }); }
+  chipOrder(key,defaults).forEach(function(t){ var c=el('button',{type:'button',class:'chip',text:t}); c.addEventListener('click',function(){ inp.value=t; upd(); }); chips.appendChild(c); });
+  inp.addEventListener('input',upd);
+  inp.addEventListener('blur',function(){ var v=parseTimeInput(inp.value); if(v) inp.value=v; upd(); });
+  var w=el('div',{class:'f'},[el('span',{class:'small',text:label}),chips,inp,hint]); w.style.margin='10px 0 0';
+  setTimeout(upd,0); return w;
+}
+/* 小月曆：手打日期之外的第二種輸入。週末與放假日用紅字加小圓點標出（不只靠顏色） */
+var CAL_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+var openCal=null;
+function isOffDay(iso){ return !!GOV_NAMES[iso]||((cfg&&cfg.offDays)||[]).indexOf(iso)>=0; }
+function calendar(o){
+  var box=el('div',{class:'cal',role:'group'}), month=null;
+  box.hidden=true;
+  function draw(){
+    box.innerHTML='';
+    var y=month.getFullYear(), m=month.getMonth(), t=todayISO();
+    var prev=el('button',{type:'button',class:'cal-nav','aria-label':'上個月',text:'‹'}), next=el('button',{type:'button',class:'cal-nav','aria-label':'下個月',text:'›'});
+    prev.addEventListener('click',function(){ month=new Date(y,m-1,1); draw(); });
+    next.addEventListener('click',function(){ month=new Date(y,m+1,1); draw(); });
+    box.appendChild(el('div',{class:'cal-head'},[prev,el('b',{text:y+' 年 '+(m+1)+' 月','aria-live':'polite'}),next]));
+    var g=el('div',{class:'cal-grid'});
+    WD.forEach(function(w,i){ g.appendChild(el('div',{class:'cal-wd'+(i===0||i===6?' off':''),text:w})); });
+    for(var i=0;i<new Date(y,m,1).getDay();i++) g.appendChild(el('div'));
+    for(var d=1;d<=new Date(y,m+1,0).getDate();d++){
+      var iso=todayISO(new Date(y,m,d)), wd=new Date(y,m,d).getDay(), hol=isOffDay(iso), sel=o.isSelected(iso);
+      var b=el('button',{type:'button',class:'cal-d'+(wd===0||wd===6||hol?' off':'')+(hol?' hol':'')+(iso===t?' today':'')+(sel?' sel':''),text:String(d),
+        'aria-label':(m+1)+'月'+d+'日 星期'+WD[wd]+(GOV_NAMES[iso]?' '+GOV_NAMES[iso]:hol?' 放假':'')+(iso===t?' 今天':''),'aria-pressed':sel?'true':'false'});
+      (function(iso){ b.addEventListener('click',function(){ o.onPick(iso); if(o.keepOpen) draw(); else close(); }); })(iso);
+      g.appendChild(b);
+    }
+    box.appendChild(g);
+    var todayBtn=el('button',{type:'button',text:'回到本月'});
+    todayBtn.addEventListener('click',function(){ month=new Date(); month.setDate(1); draw(); });
+    box.appendChild(el('div',{class:'cal-foot'},[el('span',{text:o.note||'紅字・圓點：週末或放假日'}),todayBtn]));
+  }
+  function open(iso){ if(openCal&&openCal!==api) openCal.close(); var b=iso?parseISO(iso):new Date(); month=new Date(b.getFullYear(),b.getMonth(),1); draw(); box.hidden=false; o.btn.setAttribute('aria-expanded','true'); openCal=api;
+    setTimeout(function(){ var r=box.getBoundingClientRect(), nav=document.querySelector('nav.tabs'), limit=nav?nav.getBoundingClientRect().top:window.innerHeight; if(r.bottom>limit) window.scrollBy({top:r.bottom-limit+12,behavior:'smooth'}); },0); }
+  function close(){ box.hidden=true; o.btn.setAttribute('aria-expanded','false'); if(openCal===api) openCal=null; }
+  var api={el:box,open:open,close:close,redraw:function(){ draw(); },toggle:function(iso){ box.hidden?open(iso):close(); }};
+  o.btn.setAttribute('aria-expanded','false');
+  function onKey(e){ if(e.key==='Escape'&&!box.hidden){ close(); o.btn.focus(); } }
+  box.addEventListener('keydown',onKey); o.btn.addEventListener('keydown',onKey);
+  return api;
+}
+function calButton(label){ var b=el('button',{type:'button',class:'icon-btn','aria-label':label}); b.innerHTML=CAL_ICON; return b; }
+function dateField(id,label,iso){
+  var inp=el('input',{id:id,type:'text',inputmode:'numeric',autocomplete:'off',placeholder:'例如 1020',value:iso?mmdd(iso):''});
+  var hint=el('span',{class:'hint'}), btn=calButton('用月曆選'+label);
+  function upd(){ var v=parseDateInput(inp.value); hint.textContent=inp.value?(v?(v.slice(0,4)!==String(new Date().getFullYear())?v.slice(0,4)+'/':'')+fmtDWk(v)+(GOV_NAMES[v]?' '+GOV_NAMES[v]:''):'請輸入四位數，例如 1020'):''; hint.className='hint'+(inp.value&&!v?' err':''); }
+  var cal=calendar({btn:btn,isSelected:function(x){ return parseDateInput(inp.value)===x; },onPick:function(x){ inp.value=dateText(x); inp.dispatchEvent(new Event('input',{bubbles:true})); btn.focus(); }});
+  btn.addEventListener('click',function(){ cal.toggle(parseDateInput(inp.value)); });
+  inp.addEventListener('input',upd);
+  var w=el('div',{class:'f'},[el('span',{class:'small',text:label}),el('div',{class:'date-row'},[inp,btn]),hint,cal.el]); w.style.margin='10px 0 0';
+  setTimeout(upd,0); return w;
+}
+/* 請假可以一次請多天：每一天有自己的日期與時間，假別、事由共用。第一天沿用 ap-date / ap-start / ap-end */
+var daySeq=0;
+var ZH_NUM=['一','二','三','四','五','六','七','八','九','十'];
+function dayLabel(i){ return '第'+(ZH_NUM[i]||String(i+1))+'天'; }
+function workHours(){ return {ws:normHM(cfg&&cfg.work&&cfg.work.start,'09:00'), we:normHM(cfg&&cfg.work&&cfg.work.end,'18:00')}; }
+function nextWorkday(iso){ var d=parseISO(iso); do{ d.setDate(d.getDate()+1); }while(d.getDay()===0||d.getDay()===6); return todayISO(d); }
+function addLeaveDay(v){
+  var n=++daySeq, sfx=(n===1?'':'-'+n), wh=workHours();
+  var blk=el('div',{class:'day'}), head=el('div',{class:'day-head'},[el('b',{class:'day-label'})]);
+  if(n>1){ var x=el('button',{type:'button',class:'day-x',text:'移除這天'}); x.addEventListener('click',function(){ blk.remove(); relabelDays(); $('form-days').innerHTML=''; }); head.appendChild(x); }
+  var full=el('button',{type:'button',class:'chip',text:'全天'});
+  full.addEventListener('click',function(){ setVal('ap-start'+sfx,wh.ws); setVal('ap-end'+sfx,wh.we); });
+  blk.appendChild(head);
+  blk.appendChild(dateField('ap-date'+sfx,'請假日期',v.date));
+  blk.appendChild(el('div',{class:'chips',style:'margin-top:10px'},[full]));
+  blk.appendChild(timeField('ap-start'+sfx,'起始時間','leave.start',v.start,[wh.ws,'13:00','14:00']));
+  blk.appendChild(timeField('ap-end'+sfx,'結束時間','leave.end',v.end,[wh.we,'12:00','17:00']));
+  blk.setAttribute('data-sfx',sfx);
+  $('ap-days').appendChild(blk); relabelDays(); $('form-days').innerHTML='';
+  return blk;
+}
+function relabelDays(){
+  var bs=document.querySelectorAll('#ap-days .day'), multi=bs.length>1;
+  bs.forEach(function(b,i){ var h=b.querySelector('.day-head'); h.hidden=!multi; h.querySelector('.day-label').textContent=dayLabel(i); b.style.borderTop=(i===0?'0':''); b.style.marginTop=(i===0?'0':''); });
+}
+function leaveDays(){
+  return Array.prototype.map.call(document.querySelectorAll('#ap-days .day'),function(b){
+    var sfx=b.getAttribute('data-sfx'), st=parseTimeInput($('ap-start'+sfx).value), en=parseTimeInput($('ap-end'+sfx).value);
+    return {date:parseDateInput($('ap-date'+sfx).value), start:st, end:en, hours:leaveHours(st,en)};
+  });
+}
+function isFullDay(day){ var wh=workHours(); return !!day.start&&!!day.end&&toMin(day.start)<=toMin(wh.ws)&&toMin(day.end)>=toMin(wh.we); }
+/* 合計：整天算「天」，其他算「小時」，例如 共2天、共6小時、共2天又3小時 */
+function leaveTotal(days){
+  var full=0, hrs=0; days.forEach(function(x){ if(isFullDay(x)) full++; else hrs+=x.hours; });
+  hrs=Math.round(hrs*10)/10;
+  return '共'+(full?full+'天':'')+(full&&hrs?'又':'')+(hrs||!full?hrs+'小時':'');
+}
+function leaveTimeText(day){ return day.start+' – '+day.end+(isFullDay(day)?'（全天）':'（共'+day.hours+'小時）'); }
+function renderApply(){
+  var box=$('apply-fields'); box.innerHTML=''; $('form-days').innerHTML=''; daySeq=0;
+  var ws=normHM(cfg&&cfg.work&&cfg.work.start,'09:00'), we=normHM(cfg&&cfg.work&&cfg.work.end,'18:00');
+  var note=$('apply-note'); note.textContent='';
+  if(kind==='leave'){
+    var types=strList(cfg&&cfg.forms&&cfg.forms.leave&&cfg.forms.leave.types,['事假','病假','特別休假']).map(function(t){return {v:t,t:t};}).concat([{v:'__other__',t:'其他'}]);
+    box.appendChild(field('ap-type','假別','select',types[0].v,types));
+    var ow=field('ap-type-other','其他假別','text','',{placeholder:'例如：公假'}); ow.id='ap-type-other-wrap'; ow.hidden=true; box.appendChild(ow);
+    box.appendChild(el('div',{id:'ap-days'}));
+    addLeaveDay({date:todayISO(),start:ws,end:we});
+    var more=el('button',{type:'button',class:'btn block',id:'btn-add-day',text:'＋ 加一天'});
+    more.addEventListener('click',function(){ var ds=leaveDays(), last=ds[ds.length-1]||{}; addLeaveDay({date:nextWorkday(last.date||todayISO()),start:last.start||ws,end:last.end||we}); });
+    box.appendChild(more);
+    box.appendChild(field('ap-reason','請假事由','text','',{placeholder:'例如：家裡有事要處理'}));
+    box.appendChild(field('ap-handover','工作交接（選填）','text','',{placeholder:'例如：已交接給同事○○'}));
+    $('ap-type').addEventListener('change',function(){ $('ap-type-other-wrap').hidden=(this.value!=='__other__'); });
+    note.textContent='請假要事先提出。寄信、填表單都做完，HR 才會處理。';
+  } else if(kind==='overtime'){
+    box.appendChild(dateField('ap-date','加班日期',todayISO()));
+    box.appendChild(timeField('ap-start','起始時間','overtime.start',we,[we,'18:30','19:00']));
+    box.appendChild(timeField('ap-end','結束時間','overtime.end',addHours(we,2),[addHours(we,2),addHours(we,1),addHours(we,3)]));
+    box.appendChild(field('ap-reason','加班事由','text','',{placeholder:'例如：趕 10/20 的提案'}));
+    var comps=strList(cfg&&cfg.forms&&cfg.forms.overtime&&cfg.forms.overtime.comps,['補休','加班費']).map(function(c){ return {v:c,t:c.split('(')[0]}; });
+    box.appendChild(field('ap-comp','換抵方式','select',comps[0].v,comps));
+    note.textContent='加班要事先讓主管同意。';
+  } else {
+    box.appendChild(field('ap-dest','地點','text','',{placeholder:'例如：台北某大樓'}));
+    box.appendChild(field('ap-reason','活動或事由','text','',{placeholder:'例如：某某研討會'}));
+    box.appendChild(dateField('ap-date','出發日',todayISO()));
+    box.appendChild(dateField('ap-end-date','結束日',todayISO()));
+    box.appendChild(timeField('ap-start','起始時間','travel.start',ws,[ws,'08:00','13:00']));
+    box.appendChild(timeField('ap-end','結束時間','travel.end',we,[we,'17:00','12:00']));
+    var c2=el('input',{type:'checkbox',id:'ap-nooffice'}); c2.checked=true; box.appendChild(el('label',{class:'chk'},[c2,'不進辦公室']));
+    box.appendChild(field('ap-transport','交通方式（選填）','text','',{placeholder:'例如：捷運、高鐵、自行開車'}));
+    var tf=cfg&&cfg.forms&&cfg.forms.travel;
+    note.textContent=(tf&&isEntry(tf.date)?'差旅表單要登入 Google 才能填，會幫你預填日期、時間和事由（地點會寫在事由前面），附件請自己上傳。':'差旅表單要登入 Google 才能填，開啟後請自己填。')+'出差期間每天還是要打卡，地點選「其他」填地點。';
+  }
+  renderSenderHint();
+}
+function applyData(){
+  var d={kind:kind};
+  d.date=parseDateInput($('ap-date').value); d.reason=($('ap-reason').value||'').trim();
+  d.start=parseTimeInput($('ap-start').value); d.end=parseTimeInput($('ap-end').value);
+  if(kind==='leave'){ d.type=$('ap-type').value; d.typeOther=($('ap-type-other')?$('ap-type-other').value:'').trim(); d.typeLabel=(d.type==='__other__'?d.typeOther:d.type); }
+  if(kind==='overtime'){ d.comp=$('ap-comp').value; d.compLabel=d.comp.split('(')[0]; var span=toMin(d.end)-toMin(d.start); d.nextDay=span<0; if(span<0) span+=1440; d.hours=Math.round(span/60*10)/10; }
+  if(kind==='travel'){ d.dest=($('ap-dest').value||'').trim(); d.endDate=parseDateInput($('ap-end-date').value)||d.date; d.noOffice=$('ap-nooffice').checked; d.transport=($('ap-transport').value||'').trim(); }
+  if(kind==='leave'){
+    d.handover=($('ap-handover').value||'').trim();
+    d.days=leaveDays().sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
+    var d0=d.days[0]||{}; d.date=d0.date||''; d.start=d0.start||''; d.end=d0.end||''; d.hours=d0.hours||0;
+    d.total=leaveTotal(d.days);
+  }
+  return d;
+}
+function validate(d){
+  if(d.days){
+    var seen={}, multi=d.days.length>1, raw=leaveDays();
+    for(var i=0;i<raw.length;i++){
+      var x=raw[i], who=multi?dayLabel(i)+'：':'';
+      if(!x.date) return who+'請輸入日期，例如 1020';
+      if(!x.start||!x.end) return who+'請輸入時間，例如 0930 或 1630';
+      if(toMin(x.end)<=toMin(x.start)) return who+'結束時間要在起始時間之後';
+      if(seen[x.date]) return fmtMD(x.date)+' 重複了，請改日期或移除一天';
+      seen[x.date]=1;
+    }
+  }
+  if(!d.date) return '請輸入日期，例如 1020';
+  if(kind==='leave'&&!d.typeLabel) return '請選假別';
+  if(kind==='travel'&&!d.dest) return '請填地點';
+  if(!d.reason) return kind==='travel'?'請填活動或事由':'請填事由';
+  if(!d.start||!d.end) return '請輸入時間，例如 0930 或 1630';
+  if(toMin(d.end)===toMin(d.start)||(kind!=='overtime'&&toMin(d.end)<toMin(d.start))) return '結束時間要在起始時間之後';
+  if(kind==='travel'&&d.endDate<d.date) return '結束日不能早於出發日';
+  return '';
+}
+function recordUse(d){ (d.days||[d]).forEach(function(x){ bumpFreq(d.kind+'.start',x.start); bumpFreq(d.kind+'.end',x.end); }); }
+function renderSenderHint(){ var h=$('sender-hint'), e=cfg&&cfg.senderEmail; h.hidden=!e; if(e) h.textContent='寄出前確認寄件者是 '+e+'。'; }
+function summary(d){
+  if(d.kind==='leave'&&d.days&&d.days.length>1) return d.days.map(function(x){ var q=x.date.split('-'); return (+q[1])+'/'+(+q[2]); }).join('、')+' '+d.typeLabel+' '+d.total;
+  if(d.kind==='leave') return fmtMD(d.date)+' '+d.start+'–'+d.end+' '+d.typeLabel;
+  if(d.kind==='overtime') return fmtMD(d.date)+' 加班 '+d.start+'–'+(d.nextDay?'翌日':'')+d.end;
+  return (d.endDate&&d.endDate!==d.date?fmtMD(d.date)+'–'+fmtMD(d.endDate):fmtMD(d.date))+' 出差 '+d.dest;
+}
+function fmtDWk(iso){ var p=iso.split('-'); return (+p[1])+'/'+(+p[2])+'（週'+WD[parseISO(iso).getDay()]+'）'; }
+function leaveHours(a,b){ var s=toMin(a), e=toMin(b), m=e-s; var ov=Math.max(0,Math.min(e,780)-Math.max(s,720)); m-=ov; return m>0?Math.round(m/60*10)/10:0; }
+function mailFor(d){
+  var c=cfg||{}, sig=c.name||'', full=c.fullName||c.name||'', sup=(c.supervisor&&c.supervisor.title)||'', hr=(c.hr&&c.hr.name)||'';
+  var label={leave:'請假',overtime:'加班',travel:'差旅'}[d.kind];
+  var subject='['+label+'申請] '+full+' '+fmtDot(d.date);
+  if(d.kind==='leave'&&d.days&&d.days.length){
+    subject='['+label+'申請] '+full+' '+d.days.map(function(x,i){ return (i&&x.date.slice(0,4)===d.days[0].date.slice(0,4))?fmtDot(x.date).slice(5):fmtDot(x.date); }).join(' & ')+'（'+d.total+'）';
+  }
+  var lines=[(sup||'主管')+'好：','','以下為'+label+'申請，再麻煩協助確認並轉寄給'+(hr||'人資')+'覆核，謝謝！',''];
+  if(d.kind==='leave'){
+    var days=(d.days&&d.days.length)?d.days:[{date:d.date,start:d.start,end:d.end,hours:d.hours}];
+    /* 全部都是整天：日期列成一行、寫天數，不分「第一天、第二天」 */
+    if(days.every(isFullDay)){
+      lines.push('・假別：'+d.typeLabel);
+      lines.push('・日期：'+days.map(function(x){ return fmtDWk(x.date); }).join('、'));
+      lines.push('・天數：'+days.length+'天');
+      lines.push('・事由：'+d.reason);
+      if(d.handover) lines.push('・工作交接：'+d.handover);
+    } else days.forEach(function(x,i){
+      if(days.length>1){ if(i) lines.push(''); lines.push(dayLabel(i)); }
+      lines.push('・假別：'+d.typeLabel);
+      lines.push('・日期：'+fmtDWk(x.date));
+      lines.push('・時間：'+leaveTimeText(x));
+      lines.push('・事由：'+d.reason);
+    });
+    if(d.handover&&!days.every(isFullDay)){ if(days.length>1) lines.push(''); lines.push('・工作交接：'+d.handover); }
+  } else if(d.kind==='overtime'){
+    lines.push('・日期：'+fmtDWk(d.date));
+    lines.push('・時間：'+d.start+' – '+(d.nextDay?'翌日':'')+d.end+'（共'+d.hours+'小時）');
+    lines.push('・事由：'+d.reason);
+    lines.push('・換抵方式：'+d.compLabel);
+  } else {
+    var multi=d.endDate&&d.endDate!==d.date;
+    lines.push('・日期：'+fmtDWk(d.date)+(multi?' 至 '+fmtDWk(d.endDate):''));
+    lines.push('・時間：'+d.start+' – '+d.end);
+    lines.push('・地點：'+d.dest);
+    lines.push('・事由：'+d.reason);
+    lines.push('・是否進辦公室：'+(d.noOffice?'否':'是'));
+    if(d.transport) lines.push('・交通方式：'+d.transport);
+  }
+  lines.push(''); lines.push(sig);
+  return {subject:subject, body:lines.join('\r\n')};
+}
+function formURLFor(d){
+  var f=cfg&&cfg.forms&&cfg.forms[d.kind]; if(!f||!isFormURL(f.url)) return '';
+  if(d.kind==='travel'){
+    if(!(isEntry(f.date)&&isEntry(f.endDate)&&isEntry(f.start)&&isEntry(f.end)&&isEntry(f.reason))) return f.url;
+    var tp={usp:'pp_url'}, a=d.date.split('-'), b=(d.endDate||d.date).split('-'), ts=d.start.split(':'), te=d.end.split(':');
+    tp[f.date+'_year']=a[0]; tp[f.date+'_month']=String(+a[1]); tp[f.date+'_day']=String(+a[2]);
+    tp[f.endDate+'_year']=b[0]; tp[f.endDate+'_month']=String(+b[1]); tp[f.endDate+'_day']=String(+b[2]);
+    tp[f.start+'_hour']=ts[0]; tp[f.start+'_minute']=ts[1]; tp[f.end+'_hour']=te[0]; tp[f.end+'_minute']=te[1];
+    tp[f.reason]=(d.dest?d.dest+' ':'')+d.reason;
+    return f.url+'?'+qs(tp);
+  }
+  var p={usp:'pp_url'}, dp=d.date.split('-');
+  if(d.kind==='leave'){
+    if(d.type==='__other__'){ p[f.type]='__other_option__'; p[f.type+'.other_option_response']=d.typeOther; } else p[f.type]=d.type;
+  }
+  p[f.date+'_year']=dp[0]; p[f.date+'_month']=String(+dp[1]); p[f.date+'_day']=String(+dp[2]);
+  var s=d.start.split(':'), e=d.end.split(':');
+  p[f.start+'_hour']=s[0]; p[f.start+'_minute']=s[1]; p[f.end+'_hour']=e[0]; p[f.end+'_minute']=e[1];
+  p[f.reason]=d.reason;
+  if(d.kind==='overtime') p[f.comp]=d.comp;
+  return f.url+'?'+qs(p);
+}
+function upsertReq(d){
+  var s=summary(d), ex=reqs.filter(function(r){ return r.summary===s; })[0];
+  if(!ex){ ex={id:uid(),ts:new Date().toISOString(),kind:d.kind,summary:s,mail:false,form:false}; reqs.unshift(ex); if(reqs.length>30) reqs.length=30; }
+  ex.data=JSON.parse(JSON.stringify(d));
+  updateLeaveDays(ex.id,d);
+  return ex;
+}
+function dateText(iso){ return parseDateInput(mmdd(iso))===iso?mmdd(iso):iso.replace(/-/g,''); }
+function setVal(id,v){ var e=$(id); if(!e||v==null) return; e.value=v; e.dispatchEvent(new Event('input')); if(e.tagName==='SELECT') e.dispatchEvent(new Event('change')); }
+function fillApply(d){
+  kind=d.kind;
+  document.querySelectorAll('#seg-kind button').forEach(function(x){ var on=x.getAttribute('data-kind')===kind; x.classList.toggle('on',on); x.setAttribute('aria-pressed',on?'true':'false'); });
+  renderApply();
+  setTimeout(function(){
+    if(d.date) setVal('ap-date',dateText(d.date));
+    setVal('ap-start',d.start); setVal('ap-end',d.end); setVal('ap-reason',d.reason);
+    if(kind==='leave'&&d.days) d.days.slice(1).forEach(function(x){ var b=addLeaveDay({date:x.date,start:x.start,end:x.end}), sfx=b.getAttribute('data-sfx'); setVal('ap-date'+sfx,dateText(x.date)); });
+    if(kind==='leave'){ setVal('ap-type',d.type); if(d.type==='__other__') setVal('ap-type-other',d.typeOther); setVal('ap-handover',d.handover); }
+    if(kind==='overtime') setVal('ap-comp',d.comp);
+    if(kind==='travel'){ setVal('ap-dest',d.dest); if(d.endDate) setVal('ap-end-date',dateText(d.endDate)); if($('ap-nooffice')) $('ap-nooffice').checked=d.noOffice!==false; setVal('ap-transport',d.transport); }
+    var n=$('apply-note'); n.textContent='已帶入「'+summary(d)+'」，確認內容後按下面的按鈕。';
+    $('tab-apply').scrollIntoView({behavior:'smooth',block:'start'});
+  },10);
+}
+$('btn-mail').addEventListener('click',function(){
+  var d=applyData(), err=validate(d); if(err){ alert(err); return; }
+  if(!cfg||!cfg.supervisor||!cfg.supervisor.email){ showTab('settings'); toast('請先填主管 Email','err'); $('cfg-sup-email').focus(); return; }
+  var m=mailFor(d), to=cfg.supervisor.email, cc=(cfg.ccHr&&cfg.hr&&cfg.hr.email)?cfg.hr.email:'';
+  var url='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body)+(cc?'&cc='+encodeURIComponent(cc):'');
+  upsertReq(d); save(KEY_REQ,reqs); renderReqs(); recordUse(d);
+  window.location.href=url;
+});
+$('btn-copy-mail').addEventListener('click',function(){
+  var d=applyData(), err=validate(d); if(err){ alert(err); return; }
+  var m=mailFor(d), to=(cfg&&cfg.supervisor&&cfg.supervisor.email)||'';
+  upsertReq(d); save(KEY_REQ,reqs); renderReqs(); recordUse(d);
+  copyText((to?'收件者：'+to+'\n':'')+'主旨：'+m.subject+'\n\n'+m.body.replace(/\r\n/g,'\n'),'已複製信件內容，到 Outlook 新增郵件後貼上，主旨記得剪下貼到主旨欄。');
+});
+$('btn-form').addEventListener('click',function(){
+  var d=applyData(), err=validate(d); if(err){ alert(err); return; }
+  if(!hasForm(d.kind)){ showTab('settings'); toast('設定碼裡沒有這張表單，請重新產生設定碼','err'); return; }
+  var url=formURLFor(d); if(!url){ showTab('settings'); toast('表單網址無效，請重新套用設定碼','err'); return; }
+  upsertReq(d); save(KEY_REQ,reqs); renderReqs(); recordUse(d);
+  if(d.days&&d.days.length>1){ renderFormDays(d); return; }
+  if(!openExternal(url)){ var n=$('apply-note'); n.innerHTML=''; n.appendChild(el('a',{href:url,target:'_blank',rel:'noopener',class:'btn primary block',text:'打開表單'})); }
+});
+$('apply-fields').addEventListener('input',function(){ $('form-days').innerHTML=''; });
+/* 表單一次只能填一天：多天請假時每天一顆按鈕，各自預填那一天 */
+function renderFormDays(d){
+  var box=$('form-days'); box.innerHTML='';
+  box.appendChild(el('p',{class:'small',style:'margin-top:8px',text:'表單一次只能填一天，請每一天各開一次、各按一次提交：'}));
+  d.days.forEach(function(x,i){
+    var url=formURLFor(Object.assign({},d,{date:x.date,start:x.start,end:x.end,days:null}));
+    var b=el('a',{href:url,target:'_blank',rel:'noopener',class:'btn block',text:'開啟表單（'+dayLabel(i)+' '+fmtMD(x.date)+'）'});
+    b.addEventListener('click',function(){ b.textContent='✓ 已開啟（'+dayLabel(i)+' '+fmtMD(x.date)+'）'; });
+    box.appendChild(b);
+  });
+}
+var KIND_LABEL={leave:'請假',overtime:'加班',travel:'差旅'};
+function renderReqs(){
+  var ul=$('req-list'); ul.innerHTML=''; $('req-empty').hidden=reqs.length>0;
+  reqs.forEach(function(r){
+    var li=el('li'), t=el('div',{class:'t'});
+    var head=el('button',{type:'button',class:'req-head'},[el('b',{text:KIND_LABEL[r.kind]||r.kind}),' ',r.summary]);
+    head.addEventListener('click',function(){ if(r.data) fillApply(r.data); else alert('這筆是舊版建立的，沒有存詳細內容。重新填一次之後，下次就能點這裡帶入。'); });
+    t.appendChild(head);
+    if(r.data) t.appendChild(el('div',{class:'small muted',text:'點上面一行可帶入內容'}));
+    var row=el('div',{class:'row'});
+    ['mail','form'].forEach(function(k){
+      var c=el('input',{type:'checkbox'}); c.checked=!!r[k];
+      c.addEventListener('change',function(){ r[k]=c.checked; save(KEY_REQ,reqs); });
+      row.appendChild(el('label',{class:'chk'},[c,k==='mail'?'信已寄出':'表單已提交']));
+    });
+    t.appendChild(row); li.appendChild(t);
+    var x=el('button',{class:'x',text:'刪除'}); x.addEventListener('click',function(){ if(confirm('刪除這筆？')){ reqs=reqs.filter(function(q){return q.id!==r.id;}); save(KEY_REQ,reqs); renderReqs(); updateLeaveDays(r.id,null); } });
+    li.appendChild(x); ul.appendChild(li);
+  });
+}
+
+/* ───────── 紀錄 ───────── */
+var STATUS_LABEL={unconfirmed:'未確認提交',pending:'未收到 Google 回應'};
+function renderLog(){
+  var ul=$('log-list'), live=liveLog(); ul.innerHTML=''; $('log-empty').hidden=live.length>0;
+  live.slice().sort(function(a,b){ return a.ts<b.ts?-1:1; }).reverse().slice(0,120).forEach(function(r){
+    var li=el('li'), t=el('div',{class:'t'});
+    var head=el('div',{},[el('b',{text:r.date+' '+r.time}),' '+(TYPE_LABEL[r.type]||r.type)+(r.device?' · '+r.device:'')]);
+    if(STATUS_LABEL[r.status]) head.appendChild(el('span',{class:'tag',text:STATUS_LABEL[r.status]}));
+    t.appendChild(head);
+    t.appendChild(el('div',{class:'small',text:r.place}));
+    li.appendChild(t);
+    if(STATUS_LABEL[r.status]){ var ok=el('button',{class:'x',text:'已提交',style:'color:var(--safe)'}); ok.addEventListener('click',function(){ setStatus(r.id,'confirmed'); renderLog(); renderStatus(); }); li.appendChild(ok); }
+    var x=el('button',{class:'x',text:'刪除'}); x.addEventListener('click',function(){ if(confirm('刪除這筆紀錄？（Google 表單那邊不會被刪）')){ removeEntry(r.id); renderLog(); renderStatus(); } });
+    li.appendChild(x); ul.appendChild(li);
+  });
+}
+$('btn-csv').addEventListener('click',function(){
+  var csv='日期,時間,類型,地點,狀態\n'+liveLog().map(function(r){ return [r.date,r.time,TYPE_LABEL[r.type]||r.type,'"'+String(r.place).replace(/"/g,'""')+'"',STATUS_LABEL[r.status]||'已送出'].join(','); }).join('\n');
+  copyText(csv,'已複製 CSV，可以貼到備忘錄或 Excel');
+});
+function copyText(text,okMsg){
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){ alert(okMsg); },function(){ prompt('請手動複製：',text); }); }
+  else prompt('請手動複製：',text);
+}
+
+/* ───────── 設定 ───────── */
+function renderSettings(){
+  var c=cfg||{};
+  $('cfg-fullname').value=c.fullName||''; $('cfg-name').value=c.name||''; $('cfg-sender').value=c.senderEmail||'';
+  $('cfg-sync-url').value=(c.sync&&c.sync.url)||''; $('cfg-sync-token').value=(c.sync&&c.sync.token)||''; renderSyncStatus();
+  $('cfg-sup-title').value=(c.supervisor&&c.supervisor.title)||''; $('cfg-sup-email').value=(c.supervisor&&c.supervisor.email)||'';
+  $('cfg-hr-name').value=(c.hr&&c.hr.name)||''; $('cfg-hr-email').value=(c.hr&&c.hr.email)||''; $('cfg-cc-hr').checked=!!c.ccHr;
+  $('cfg-work-start').value=normHM(c.work&&c.work.start,'09:00'); $('cfg-work-end').value=normHM(c.work&&c.work.end,'18:00');
+  $('cfg-clockin-url').value=(c.forms&&c.forms.clockin&&c.forms.clockin.url)||''; $('cfg-clockin-desc').value=(c.forms&&c.forms.clockin&&c.forms.clockin.desc)||'';
+  $('cfg-submit-mode').value=(c.submitMode==='tab'?'tab':'iframe');
+  renderRemind(); renderOffDays();
+}
+/* 忘記打卡提醒：給 iPhone 捷徑的檢查網址，與不用提醒的日子 */
+/* 政府行政機關辦公日曆表（115、116 年）裡落在平日的放假日；週末本來就不提醒。換年時更新這份清單與 HOLIDAYS_V */
+var GOV_NAMES={'2026-12-25':'行憲紀念日','2027-01-01':'元旦','2027-02-04':'小年夜','2027-02-05':'除夕','2027-02-08':'春節（初三）',
+  '2027-02-09':'春節補假','2027-02-10':'春節補假','2027-03-01':'和平紀念日補假','2027-04-05':'清明節','2027-04-06':'兒童節補假',
+  '2027-04-30':'勞動節補假','2027-06-09':'端午節','2027-09-15':'中秋節','2027-09-28':'教師節','2027-10-11':'國慶日補假',
+  '2027-10-25':'光復節','2027-12-24':'行憲紀念日補假','2027-12-31':'元旦補假'};
+var GOV_OFF_DAYS=Object.keys(GOV_NAMES).sort();
+var HOLIDAYS_V='2027';
+function offDays(c){ return (Array.isArray(c.offDays)?c.offDays:GOV_OFF_DAYS).filter(function(x){ return x>=todayISO(); }); }
+/* 已存過放假日的設定，第一次遇到新版清單時把國定假日併進去（自己加的日子保留）；有同步時等同步完再做，免得蓋掉另一台的修改 */
+function mergeGovHolidays(){
+  if(!cfg||cfg.holidaysV===HOLIDAYS_V) return;
+  var list=offDays(cfg); GOV_OFF_DAYS.forEach(function(x){ if(x>=todayISO()&&list.indexOf(x)<0) list.push(x); });
+  cfg.offDays=list.sort(); cfg.holidaysV=HOLIDAYS_V; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); renderSettings(); scheduleSync();
+}
+/* 放假日只會填未來的日子：四位數日期一律當成「下一次的那天」 */
+function parseFutureDate(v){ var iso=parseDateInput(v); if(iso&&iso<todayISO()&&String(v).replace(/\D/g,'').length<=4) iso=(+iso.slice(0,4)+1)+iso.slice(4); return iso; }
+function ymdText(iso){ return (iso.slice(0,4)!==String(new Date().getFullYear())?iso.slice(0,4)+'/':'')+fmtMD(iso); }
+function checkURL(type){ return cfg.sync.url+'?token='+encodeURIComponent(cfg.sync.token)+'&check='+type; }
+function renderRemind(){
+  var box=$('remind-box'); box.innerHTML='';
+  if(!syncReady()){ box.appendChild(el('p',{class:'small err',text:'要先設定上面的跨裝置同步，才能用提醒。'})); return; }
+  [['in','上班檢查網址'],['out','下班檢查網址']].forEach(function(t){
+    var b=el('button',{type:'button',class:'btn block',text:'複製'+t[1]});
+    b.addEventListener('click',function(){ copyText(checkURL(t[0]),'已複製'+t[1]+'，貼到捷徑的「取得 URL 的內容」'); });
+    box.appendChild(b);
+  });
+}
+/* 不用提醒的日子分兩層：上面輸入（手打或月曆），下面是已加入的清單，一天一行可個別刪除 */
+function setOffDays(list){
+  cfg.offDays=list.filter(function(x,i){ return x>=todayISO()&&list.indexOf(x)===i; }).sort();
+  cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); scheduleSync(); renderOffDays();
+}
+var offCal=null;
+function renderOffAdd(){
+  var box=$('off-add'); box.innerHTML='';
+  var inp=el('input',{id:'off-input',type:'text',inputmode:'numeric',autocomplete:'off',placeholder:'例如 1225','aria-label':'要加入的日期'});
+  var btn=calButton('用月曆選不用提醒的日子'), add=el('button',{type:'button',class:'btn',id:'off-add-btn',text:'加入'});
+  var hint=el('span',{class:'hint',id:'off-hint','aria-live':'polite'});
+  function msg(t,err){ hint.textContent=t; hint.className='hint'+(err?' err':''); }
+  function addOne(){
+    if(!cfg){ msg('請先貼上設定碼',true); return; }
+    var v=inp.value.trim(); if(!v){ msg('請輸入日期，例如 1225',true); inp.focus(); return; }
+    var iso=parseFutureDate(v); if(!iso){ msg('看不懂「'+v+'」，請用四位數，例如 1225',true); inp.focus(); return; }
+    var list=offDays(cfg); if(list.indexOf(iso)>=0){ msg(ymdText(iso)+' 已經在清單裡',true); return; }
+    setOffDays(list.concat([iso])); inp.value=''; msg('已加入 '+ymdText(iso));
+  }
+  add.addEventListener('click',addOne);
+  inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); addOne(); } });
+  inp.addEventListener('input',function(){ msg(''); });
+  offCal=calendar({btn:btn,keepOpen:true,note:'點日期加入或移除',isSelected:function(x){ return offDays(cfg||{}).indexOf(x)>=0; },
+    onPick:function(x){ if(!cfg){ msg('請先貼上設定碼',true); return; } if(x<todayISO()){ msg('只能加今天以後的日子',true); return; }
+      var list=offDays(cfg), i=list.indexOf(x); if(i>=0){ list.splice(i,1); msg('已移除 '+ymdText(x)); } else { list.push(x); msg('已加入 '+ymdText(x)); } setOffDays(list); }});
+  btn.addEventListener('click',function(){ offCal.toggle(); });
+  box.appendChild(el('div',{class:'date-row'},[inp,btn,add])); box.appendChild(hint); box.appendChild(offCal.el);
+}
+function renderOffDays(){
+  if(!$('off-input')) renderOffAdd();
+  var box=$('off-list'); box.innerHTML='';
+  var ds=offDays(cfg||{}), t=todayISO(), lv=((cfg&&cfg.leaveDays)||[]).filter(function(l){ return l.date>=t; });
+  box.appendChild(el('p',{class:'sub-h',text:'已加入（'+ds.length+' 天）'}));
+  if(!ds.length) box.appendChild(el('p',{class:'small',text:'清單是空的：週末以外每天都會提醒。'}));
+  var year='', ul=null;
+  ds.forEach(function(iso){
+    if(iso.slice(0,4)!==year){ year=iso.slice(0,4); box.appendChild(el('p',{class:'off-year',text:year+' 年'})); ul=el('ul',{class:'off-list'}); box.appendChild(ul); }
+    var x=el('button',{type:'button',class:'x','aria-label':'刪除 '+fmtMD(iso),text:'✕'});
+    x.addEventListener('click',function(){ setOffDays(offDays(cfg).filter(function(d){ return d!==iso; })); var h=$('off-hint'); if(h){ h.textContent='已刪除 '+ymdText(iso)+'（要加回來就在上面輸入）'; h.className='hint'; } });
+    ul.appendChild(el('li',{},[el('span',{class:'d',text:fmtMD(iso)}),el('span',{class:'n',text:GOV_NAMES[iso]||'自己加的'}),x]));
+  });
+  if(lv.length){
+    box.appendChild(el('p',{class:'sub-h',text:'請假（申請頁自動帶入）'}));
+    var ul2=el('ul',{class:'off-list'});
+    lv.forEach(function(l){ ul2.appendChild(el('li',{},[el('span',{class:'d',text:ymdText(l.date)}),el('span',{class:'n',text:l.start+'–'+l.end})])); });
+    box.appendChild(ul2);
+    box.appendChild(el('p',{class:'small',style:'margin-top:4px',text:'要取消，到申請頁「最近的申請」刪除那一筆。'}));
+  }
+  if(offCal&&!offCal.el.hidden) offCal.redraw();
+}
+/* 申請頁送出的請假記在設定裡（會同步），讓提醒跳過請假時段；每筆申請各自增刪，不動其他裝置的請假 */
+function updateLeaveDays(reqId,d){
+  if(!cfg) return;
+  var t=todayISO(), list=(Array.isArray(cfg.leaveDays)?cfg.leaveDays:[]).filter(function(l){ return l.id!==reqId&&l.date>=t; });
+  if(d&&d.kind==='leave') (d.days||[d]).forEach(function(x){ if(x.date&&x.date>=t) list.push({id:reqId,date:x.date,start:x.start,end:x.end}); });
+  list.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
+  cfg.leaveDays=list; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); scheduleSync(); renderOffDays();
+}
+function readSettings(){
+  cfg=cfg||{v:1,forms:{}}; cfg.forms=cfg.forms||{}; cfg.supervisor=cfg.supervisor||{}; cfg.hr=cfg.hr||{}; cfg.work=cfg.work||{};
+  var ows=cfg.work.start, owe=cfg.work.end;
+  cfg.fullName=$('cfg-fullname').value.trim(); cfg.name=$('cfg-name').value.trim(); cfg.senderEmail=$('cfg-sender').value.trim();
+  var su=$('cfg-sync-url').value.trim(), st=$('cfg-sync-token').value.trim();
+  if(su&&!isSyncURL(su)){ toast('同步網址要是 https://script.google.com/macros/s/…/exec','err'); }
+  else cfg.sync={url:su,token:st};
+  cfg.supervisor.title=$('cfg-sup-title').value.trim(); cfg.supervisor.email=$('cfg-sup-email').value.trim();
+  cfg.hr.name=$('cfg-hr-name').value.trim(); cfg.hr.email=$('cfg-hr-email').value.trim(); cfg.ccHr=$('cfg-cc-hr').checked;
+  cfg.work.start=$('cfg-work-start').value||'09:00'; cfg.work.end=$('cfg-work-end').value||'18:00';
+  var u=$('cfg-clockin-url').value.trim();
+  var curURL=(cfg.forms.clockin&&cfg.forms.clockin.url)||'';
+  if(u&&cleanURL(u)!==curURL){
+    if(!(cfg.forms.clockin&&isEntry(cfg.forms.clockin.reason)&&isEntry(cfg.forms.clockin.place))){ toast('請先貼上設定碼，再換表單網址','err'); $('cfg-clockin-url').value=curURL; }
+    else if(isFormURL(u)){ cfg.forms.clockin.url=cleanURL(u); toast('表單網址已更新','ok'); }
+    else { toast('打卡表單網址要是 docs.google.com/forms/d/e/…/viewform 的完整網址（forms.gle 短網址請先在 Safari 開啟後複製網址列）','err'); $('cfg-clockin-url').value=curURL; }
+  }
+  if(cfg.forms.clockin) cfg.forms.clockin.desc=$('cfg-clockin-desc').value.trim();
+  cfg.submitMode=$('cfg-submit-mode').value;
+  cfg.updatedAt=nowMs(); renderRemind(); save(KEY_CFG,cfg); renderStatus(); renderPlaces(); renderSenderHint(); scheduleSync();
+  if(ows!==cfg.work.start||owe!==cfg.work.end) renderApply();
+}
+['cfg-fullname','cfg-name','cfg-sender','cfg-sync-url','cfg-sync-token','cfg-sup-title','cfg-sup-email','cfg-hr-name','cfg-hr-email','cfg-cc-hr','cfg-work-start','cfg-work-end','cfg-clockin-url','cfg-clockin-desc','cfg-submit-mode'].forEach(function(id){ $(id).addEventListener('change',readSettings); });
+$('btn-apply-code').addEventListener('click',function(){
+  var code=$('setup-code').value.trim(); if(!code){ toast('請先貼上設定碼','err'); return; }
+  var obj; try{ obj=JSON.parse(b64dec(code)); }catch(e){ toast('設定碼看起來不完整，請整段重新複製貼上','err'); return; }
+  if(!obj||typeof obj!=='object'||!obj.forms||typeof obj.forms!=='object'||!obj.forms.clockin){ toast('設定碼裡沒有打卡表單','err'); return; }
+  var ci=obj.forms.clockin;
+  if(!isFormURL(ci.url)||!isEntry(ci.reason)||!isEntry(ci.place)){ toast('設定碼裡的打卡表單資料不完整，請向提供設定碼的人確認','err'); return; }
+  var bad=Object.keys(obj.forms).filter(function(k){ var f=obj.forms[k]; return f&&f.url&&!isFormURL(f.url); });
+  if(bad.length){ toast('設定碼裡的表單網址無效：'+bad.join('、'),'err'); return; }
+  Object.keys(obj.forms).forEach(function(k){ obj.forms[k]=asObj(obj.forms[k]); if(obj.forms[k].url) obj.forms[k].url=cleanURL(obj.forms[k].url); });
+  obj.supervisor=asObj(obj.supervisor); obj.hr=asObj(obj.hr); obj.work=asObj(obj.work);
+  obj.work.start=normHM(obj.work.start,'09:00'); obj.work.end=normHM(obj.work.end,'18:00');
+  var incomplete=['leave','overtime'].filter(function(k){ return obj.forms[k]&&obj.forms[k].url&&!formComplete(k,obj.forms[k]); });
+  var keep=cfg||{};
+  cfg=obj;
+  ['name','fullName','senderEmail','sync'].forEach(function(k){ if(!cfg[k]&&keep[k]) cfg[k]=keep[k]; });
+  if(cfg.sync&&!(isSyncURL(cfg.sync.url)||!cfg.sync.url)) cfg.sync={url:'',token:''};
+  if(cfg.sync&&!cfg.sync.url&&keep.sync&&isSyncURL(keep.sync.url)) cfg.sync={url:keep.sync.url,token:cfg.sync.token||keep.sync.token};
+  cfg.updatedAt=nowMs();
+  ['submitMode','work','ccHr','offDays','leaveDays','holidaysV'].forEach(function(k){ if(cfg[k]==null&&keep[k]!=null) cfg[k]=keep[k]; });
+  if(keep.supervisor&&keep.supervisor.email&&!(cfg.supervisor&&cfg.supervisor.email)) cfg.supervisor=keep.supervisor;
+  if(keep.hr&&keep.hr.email&&!(cfg.hr&&cfg.hr.email)) cfg.hr=keep.hr;
+  save(KEY_CFG,cfg); renderSettings(); renderStatus(); renderPlaces(); renderApply(); $('setup-code').value=''; syncNow(true);
+  toast('設定碼已套用：'+(cfg.forms.clockin.title||'打卡表單')+(cfg.forms.clockin.desc?'（'+cfg.forms.clockin.desc+'）':'')+(incomplete.length?' 注意：'+incomplete.map(function(k){return KIND_LABEL[k];}).join('、')+'表單的代號不完整，請重新產生設定碼。':'')+(inSafari?' 提醒：加入主畫面後，要在主畫面的 App 裡再貼一次設定碼。':''),incomplete.length?'err':'');
+});
+$('btn-export-code').addEventListener('click',function(){
+  if(!cfg){ toast('還沒有設定','err'); return; }
+  copyText(b64enc(JSON.stringify(cfg)),'已複製設定碼，可貼到備忘錄備份');
+});
+$('btn-clear').addEventListener('click',function(){
+  if(!confirm('確定清除設定、打卡紀錄、申請紀錄？')) return;
+  [KEY_CFG,KEY_LOG,KEY_REQ,KEY_PREF,KEY_FREQ,KEY_SYNC].forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+  cfg=null; log=[]; reqs=[]; prefs={place:'',other:''}; freq={}; syncState={}; clearTimeout(syncTimer);
+  clearTimeout(waitTimer); lastEntryId=null; lastType=null; lastPlace=null; lockUntil=0; setLocked(false);
+  $('result-card').hidden=true; $('result-frame').innerHTML=''; $('result-err').hidden=true; $('btn-confirm').hidden=true;
+  renderSettings(); renderStatus(); renderPlaces(); renderLog(); renderReqs(); renderApply(); showTab('settings');
+});
+
+/* ───────── 同步（Google 試算表） ───────── */
+function isSyncURL(u){ return /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u||''); }
+function deviceLabel(){ var ua=navigator.userAgent; return /iPhone/.test(ua)?'iPhone':/iPad/.test(ua)?'iPad':/Android/.test(ua)?'Android':/Mac/.test(ua)?'Mac':/Windows/.test(ua)?'電腦':'其他'; }
+var syncTimer=null, syncBusy=false, lastSyncTry=0;
+function syncReady(){ return !!(cfg&&cfg.sync&&isSyncURL(cfg.sync.url)&&cfg.sync.token); }
+function scheduleSync(){
+  if(!syncReady()) return; clearTimeout(syncTimer);
+  /* 等過 syncNow 的 3 秒間隔，同步進行中就再排一次，改動才不會被略過 */
+  syncTimer=setTimeout(function(){ if(syncBusy) scheduleSync(); else syncNow(true); },Math.max(1500,3100-(Date.now()-lastSyncTry)));
+}
+function renderSyncStatus(msg,kind){
+  var e=$('sync-status'); if(!e) return;
+  if(msg){ e.textContent=msg; e.className='small '+(kind||''); return; }
+  if(!syncReady()){ e.textContent='尚未設定同步。'; e.className='small'; return; }
+  if(syncState.err){ e.textContent='上次同步失敗：'+syncState.err; e.className='small err'; return; }
+  e.textContent=syncState.at?'上次同步：'+syncState.at:'已設定，尚未同步。'; e.className='small'+(syncState.at?' sync-ok':'');
+}
+function mergeRemote(res){
+  var changed=false, byId={};
+  log.forEach(function(r){ byId[r.id]=r; });
+  (Array.isArray(res.log)?res.log:[]).forEach(function(r){
+    if(!r||typeof r!=='object'||!r.id) return;
+    var mine=byId[r.id];
+    if(!mine){ log.push(r); byId[r.id]=r; changed=true; }
+    else if((r.updatedAt||0)>(mine.updatedAt||0)){ Object.keys(r).forEach(function(k){ mine[k]=r[k]; }); changed=true; }
+  });
+  if(changed){ log.sort(function(a,b){ return a.ts<b.ts?-1:1; }); save(KEY_LOG,log); }
+  var rc=res.config;
+  if(rc&&typeof rc==='object'&&rc.forms&&rc.forms.clockin&&isFormURL(rc.forms.clockin.url)&&(rc.updatedAt||0)>((cfg&&cfg.updatedAt)||0)){
+    var mySync=cfg.sync; cfg=rc; if(!syncReady()) cfg.sync=mySync; save(KEY_CFG,cfg); renderSettings(); renderPlaces(); renderApply(); changed=true;
+  }
+  return changed;
+}
+function syncNow(force,soon){
+  if(!syncReady()||syncBusy||document.hidden) return;
+  if(Date.now()-lastSyncTry<(force?3000:soon?15000:300000)) return;
+  if(navigator.onLine===false){ syncState.err='沒有網路'; renderSyncStatus(); return; }
+  syncBusy=true; lastSyncTry=Date.now(); renderSyncStatus('同步中…');
+  var since=syncState.pushedAt||0;
+  var payload={op:'sync',token:cfg.sync.token,device:deviceLabel(),
+    upsert:log.filter(function(r){ return (r.updatedAt||0)>since; }),
+    config:((cfg.updatedAt||0)>(syncState.configAt||0))?cfg:null};
+  var startedAt=Date.now(), sentCfgAt=cfg.updatedAt||0;
+  fetch(cfg.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),redirect:'follow'})
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(!res||!res.ok) throw new Error(res&&res.error==='unauthorized'?'同步密碼不對':(res&&res.error)||'回應格式不對');
+      var changed=mergeRemote(res);
+      setTimeout(mergeGovHolidays,0);
+      /* 只把送出時的設定記為已同步；同步途中又改的設定，下次還會送 */
+      var tookRemote=!!(res.config&&cfg.updatedAt===res.config.updatedAt&&cfg.updatedAt!==sentCfgAt);
+      syncState={pushedAt:startedAt,configAt:tookRemote?cfg.updatedAt:Math.max(sentCfgAt,syncState.configAt||0),at:fmtDateLong(new Date())+' '+nowHM(),err:''};
+      save(KEY_SYNC,syncState);
+      if(changed){ renderStatus(); if(!$('tab-log').hidden) renderLog(); }
+    })
+    .catch(function(e){ syncState.err=(e&&e.message)||'連不上'; save(KEY_SYNC,syncState); })
+    .then(function(){ syncBusy=false; renderSyncStatus(); });
+}
+$('btn-sync-now').addEventListener('click',function(){ readSettings(); if(!syncReady()){ renderSyncStatus('請先填同步網址和同步密碼。','err'); return; } syncNow(true); });
+
+/* ───────── 啟動 ───────── */
+$('banner-safari').hidden=!inSafari; $('banner-inapp').hidden=!inAppBrowser;
+renderHeader();
+try{ renderPlaces(); renderStatus(); renderApply(); renderReqs(); }
+catch(e){ showTab('settings'); toast('設定讀取失敗，請重新貼設定碼（'+e.message+'）','err'); }
+if(!cfg) showTab('settings');
+renderSyncStatus(); if(syncReady()) syncNow(true); else mergeGovHolidays();
+window.daka={version:'1.5',fillApply:fillApply,parseTimeInput:parseTimeInput,parseDateInput:parseDateInput,syncNow:syncNow,mailFor:mailFor,formURLFor:formURLFor,applyData:applyData};
+})();
+</script>
+</body>
+</html>
