@@ -23,12 +23,12 @@
     --line:#E7E4DD;--line-strong:#D6D3CB;
     --navy:#20374B;--navy-2:#2C4A63;--accent:#E7A93C;--safe:#3E7A55;--terra:#B4471F;--danger:#B23125;
     --warn-bg:#FFF4D6;--warn-ink:#6B4E00;--ok-bg:#E6F2EA;--ok-ink:#1F5234;--err-bg:#F8E3E0;--err-ink:#7A1F17;
-    --link:#20374B;--holiday:#B4471F;
-    --r-lg:8px;--r:6px;--r-sm:4px;
+    --link:#20374B;--field:#8C8781;--dis-bg:#ECE9E2;--dis-ink:#66625C;
+    --r-lg:6px;--r:4px;--r-sm:2px;
   }
   @media (prefers-color-scheme: dark){
     :root{--bg:#141516;--card:#1E2022;--ink:#F1EFEA;--sub:#B5B0A8;--faint:#8C8781;--line:#2E3134;--line-strong:#3C4044;
-      --warn-bg:#3A2E0E;--warn-ink:#F3D38A;--ok-bg:#15301F;--ok-ink:#A9DCB9;--err-bg:#3B1A16;--err-ink:#F3B0A8;--danger:#F09B90;--link:#9DB2C4;--holiday:#F0A58A;--navy:#3F6A91;--navy-2:#4C7CA6;}
+      --warn-bg:#3A2E0E;--warn-ink:#F3D38A;--ok-bg:#15301F;--ok-ink:#A9DCB9;--err-bg:#3B1A16;--err-ink:#F3B0A8;--danger:#F09B90;--link:#9DB2C4;--field:#77726B;--dis-bg:#2A2D30;--dis-ink:#A7A29A;--navy:#3F6A91;--navy-2:#4C7CA6;}
   }
   *{box-sizing:border-box;margin:0;padding:0}
   [hidden]{display:none!important}
@@ -48,12 +48,12 @@
   .status .lbl{font-size:13px;color:var(--sub)}
   .status .val{font-size:24px;font-weight:700;letter-spacing:.02em}
   .status .val.empty{color:var(--faint);font-weight:500}
-  .seg{display:flex;border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden}
-  .seg button{flex:1;min-height:44px;padding:10px 4px;font:inherit;font-size:15px;background:transparent;color:var(--ink);border:0;border-right:1px solid var(--line-strong)}
+  .seg{display:flex;border:1px solid var(--field);border-radius:var(--r);overflow:hidden}
+  .seg button{flex:1;min-height:44px;padding:10px 4px;font:inherit;font-size:15px;background:transparent;color:var(--ink);border:0;border-right:1px solid var(--field)}
   .seg button:last-child{border-right:0}
   .seg button.on{background:var(--navy);color:#fff}
   .other-wrap{margin-top:8px}
-  input,select,textarea{font:inherit;font-size:17px;color:var(--ink);background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r);padding:10px 12px;width:100%}
+  input,select,textarea{font:inherit;font-size:17px;color:var(--ink);background:var(--card);border:1px solid var(--field);border-radius:var(--r);padding:10px 12px;width:100%}
   select{-webkit-appearance:none;appearance:none;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M3 6l5 5 5-5' fill='none' stroke='%238C8781' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
   textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:16px;line-height:1.3}
   label.f{display:block;margin:10px 0 0}
@@ -63,18 +63,26 @@
   .big{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 6px}
   .big button{font:inherit;font-size:26px;font-weight:700;color:#fff;border:0;border-radius:var(--r-lg);padding:26px 8px;letter-spacing:.06em;-webkit-tap-highlight-color:transparent}
   .big .in{background:var(--safe)} .big .out{background:var(--navy)}
-  .big button:disabled{opacity:.45}
+  .big button.ghost{background:var(--card);color:var(--link);box-shadow:inset 0 0 0 1.5px var(--navy)}
+  .big button:disabled{background:var(--dis-bg);color:var(--dis-ink);box-shadow:none}
+  .big button.done,.big button.done:disabled{background:var(--ok-bg);color:var(--ok-ink);box-shadow:none;font-size:20px}
+  .lock-note{text-align:center;margin:2px 0 4px}
+  .badge{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:var(--r-sm);margin-top:6px}
+  .badge.ok{background:var(--ok-bg);color:var(--ok-ink)} .badge.warn{background:var(--warn-bg);color:var(--warn-ink)}
   .btn{display:inline-block;font:inherit;font-size:16px;font-weight:600;color:var(--link);background:transparent;border:1px solid var(--line-strong);border-radius:var(--r);min-height:44px;padding:10px 14px;text-align:center;text-decoration:none;-webkit-tap-highlight-color:transparent}
   .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
   .btn.danger{color:var(--danger);border-color:var(--danger)}
   .btn.block{display:block;width:100%;margin-top:10px}
-  .btn:disabled{opacity:.45}
+  .btn:disabled{background:var(--dis-bg);color:var(--dis-ink);border-color:var(--dis-bg)}
   .small{font-size:13px;color:var(--sub)}
   .small.err{color:var(--danger);font-weight:600}
+  .small.err::before,.hint.err::before{content:"！ "}
   .banner{border-radius:var(--r);padding:10px 12px;font-size:14px;margin:10px 0}
   .banner.warn{background:var(--warn-bg);color:var(--warn-ink)}
   .banner.ok{background:var(--ok-bg);color:var(--ok-ink)}
   .banner.err{background:var(--err-bg);color:var(--err-ink)}
+  .banner.warn::before{content:"！ ";font-weight:700} .banner.ok::before{content:"✓ ";font-weight:700} .banner.err::before{content:"✕ ";font-weight:700}
+  a:not(.btn){text-decoration:underline;text-underline-offset:3px}
   iframe.gf{width:100%;height:340px;border:1px solid var(--line);border-radius:var(--r);background:#fff;margin-top:8px}
   .list{list-style:none}
   .list li{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
@@ -83,6 +91,7 @@
   .list .t b{font-weight:600}
   .list .x{font:inherit;font-size:14px;color:var(--danger);background:transparent;border:0;min-height:44px;padding:10px 12px}
   .tag{display:inline-block;font-size:12px;padding:1px 6px;border-radius:var(--r-sm);background:var(--warn-bg);color:var(--warn-ink);margin-left:6px;vertical-align:middle}
+  .tag::before{content:"！ "}
   .chk{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--sub);min-height:44px}
   .chk input{width:22px;height:22px;flex:0 0 auto}
   nav.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
@@ -104,9 +113,9 @@
   .cal-nav{width:44px;height:44px;font:inherit;font-size:22px;line-height:1;color:var(--link);background:transparent;border:0;border-radius:var(--r)}
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
   .cal-wd{font-size:13px;color:var(--sub);padding:2px 0 4px}
-  .cal-wd.off{color:var(--holiday)}
+  .cal-wd.off{color:var(--danger)}
   .cal-d{position:relative;min-height:42px;font:inherit;font-size:16px;color:var(--ink);background:transparent;border:0;border-radius:var(--r);-webkit-tap-highlight-color:transparent}
-  .cal-d.off{color:var(--holiday)}
+  .cal-d.off{color:var(--danger)}
   .cal-d.hol::after{content:"";position:absolute;left:50%;bottom:5px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:currentColor}
   .cal-d.today{box-shadow:inset 0 0 0 1.5px var(--navy)}
   .cal-d.sel{background:var(--navy);color:#fff}
@@ -127,8 +136,9 @@
     header,main{max-width:640px;margin-left:auto;margin-right:auto}
     nav.tabs{max-width:640px;left:50%;right:auto;width:100%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:var(--r-lg) var(--r-lg) 0 0}
   }
-  nav.tabs button{flex:1;font:inherit;font-size:14px;color:var(--sub);background:transparent;border:0;padding:12px 4px 10px;-webkit-tap-highlight-color:transparent}
+  nav.tabs button{position:relative;flex:1;font:inherit;font-size:14px;color:var(--sub);background:transparent;border:0;padding:12px 4px 10px;-webkit-tap-highlight-color:transparent}
   nav.tabs button.on{color:var(--link);font-weight:700}
+  nav.tabs button.on::before{content:"";position:absolute;top:0;left:50%;width:24px;height:3px;margin-left:-12px;background:var(--link);border-radius:0 0 2px 2px}
   .muted{color:var(--sub)}
   details summary{cursor:pointer;color:var(--link);font-weight:600;font-size:15px;min-height:44px;display:flex;align-items:center}
   details p,details li{font-size:14px;color:var(--sub);margin:6px 0}
@@ -136,7 +146,7 @@
 </style>
 </head>
 <body>
-<header><h1><img src="icon.svg?v=3" alt="" width="28" height="28">打卡</h1><span class="date" id="hdr-date"></span></header>
+<header><h1><img src="icon-header.svg?v=3" alt="" width="28" height="28">打卡</h1><span class="date" id="hdr-date"></span></header>
 <main>
 <div id="banner-safari" class="banner warn" hidden><span id="banner-inapp" hidden>這一頁是從 LINE 或其他 App 裡點開的，請先按右上角的「⋯」或分享鈕，選「用 Safari 開啟」。</span>到了 Safari 之後，按下方的「分享」，選「加入主畫面」，之後從主畫面的「打卡」圖示打開再貼設定碼。在 Safari 裡貼的設定和打卡紀錄不會帶進主畫面的 App。</div>
 
@@ -147,8 +157,8 @@
   <div class="card">
     <h2>今天</h2>
     <div class="status">
-      <div><div class="lbl">上班</div><div class="val empty" id="st-in">—</div></div>
-      <div><div class="lbl">下班</div><div class="val empty" id="st-out">—</div></div>
+      <div><div class="lbl">上班</div><div class="val empty" id="st-in">—</div><span class="badge" id="st-in-badge">&nbsp;</span></div>
+      <div><div class="lbl">下班</div><div class="val empty" id="st-out">—</div><span class="badge" id="st-out-badge">&nbsp;</span></div>
     </div>
   </div>
   <div class="card">
@@ -161,6 +171,7 @@
       <button class="in" id="btn-in">上班</button>
       <button class="out" id="btn-out">下班</button>
     </div>
+    <p class="small lock-note" id="lock-note" hidden>剛送出，8 秒後可再按</p>
     <button class="btn block" id="btn-trip">上班時間公出</button>
   </div>
   <div class="card" id="result-card" hidden>
@@ -287,7 +298,7 @@
   </div>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.19 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.20 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -394,15 +405,27 @@ function nowMs(){ return Date.now(); }
 function saveLog(){ save(KEY_LOG,log); scheduleSync(); }
 function removeEntry(id){ log.forEach(function(r){ if(r.id===id){ r.deleted=true; r.updatedAt=nowMs(); } }); saveLog(); }
 function todayEntries(){ var t=todayISO(); return liveLog().filter(function(r){ return r.date===t; }); }
-function renderHeader(){ $('hdr-date').textContent=fmtDateLong(new Date()); }
+function renderHeader(){ $('hdr-date').textContent=fmtMD(todayISO()); }
 function renderStatus(){
   var t=todayEntries(), ins=t.filter(function(r){return r.type==='in';}), outs=t.filter(function(r){return r.type==='out';});
   var si=$('st-in'), so=$('st-out');
   si.textContent=ins.length?ins[ins.length-1].time:'—'; si.className='val'+(ins.length?'':' empty');
   so.textContent=outs.length?outs[outs.length-1].time:'—'; so.className='val'+(outs.length?'':' empty');
+  var locked=Date.now()<lockUntil, cur=lastEntryId&&liveLog().filter(function(r){ return r.id===lastEntryId; })[0];
+  [['in',ins,'st-in-badge'],['out',outs,'st-out-badge']].forEach(function(x){
+    var last=x[1][x[1].length-1], b=$(x[2]); b.style.visibility='hidden'; b.className='badge';
+    if(!last) return;
+    if(last.status==='pending'){ b.textContent='送出中…'; b.className='badge warn'; b.style.visibility=''; }
+    else if(last.status==='unconfirmed'){ b.textContent='！未確認'; b.className='badge warn'; b.style.visibility=''; }
+    else if(locked&&cur&&cur.id===last.id){ b.textContent='✓ 已送出'; b.className='badge ok'; b.style.visibility=''; }
+  });
+  var bi=$('btn-in'), bo=$('btn-out'), justIn=locked&&cur&&cur.type==='in', justOut=locked&&cur&&cur.type==='out';
+  bi.className='in'+(ins.length?' done':''); bi.textContent=justIn?'✓ 已送出':ins.length?'✓ 上班':'上班';
+  bo.className='out'+(outs.length?' done':ins.length?'':' ghost'); bo.textContent=justOut?'✓ 已送出':outs.length?'✓ 下班':'下班';
+  $('lock-note').hidden=!locked;
   $('banner-config').hidden=hasForm('clockin');
   var bp=$('banner-pending'); bp.hidden=true;
-  var open=liveLog().filter(function(r){ return r.status==='pending'||r.status==='unconfirmed'; });
+  var open=liveLog().filter(function(r){ return (r.status==='pending'&&r.id!==inFlightId)||r.status==='unconfirmed'; });
   if(open.length&&$('result-card').hidden){
     var o=open[open.length-1];
     bp.textContent='';
@@ -412,9 +435,9 @@ function renderStatus(){
 }
 
 var TYPE_LABEL={in:'上班',out:'下班',trip:'上班時間公出'};
-var lockUntil=0, lastEntryId=null, lastType=null, lastPlace=null, waitTimer=null;
+var lockUntil=0, lastEntryId=null, lastType=null, lastPlace=null, waitTimer=null, inFlightId=null, failedId=null;
 function setStatus(id,st){ log.forEach(function(r){ if(r.id===id){ r.status=st; r.updatedAt=nowMs(); } }); saveLog(); }
-function showErr(msg){ var e=$('result-err'); e.textContent=msg; e.hidden=false; }
+function showErr(msg){ var e=$('result-err'); e.textContent=msg; e.hidden=false; failedId=inFlightId||lastEntryId; inFlightId=null; $('result-card').hidden=false; renderStatus(); $('result-card').scrollIntoView({behavior:'smooth',block:'start'}); }
 function placeValue(){ return prefs.place==='其他'?('其他:'+(prefs.other||'').trim()):prefs.place; }
 function prefillURL(type,pl){
   var f=cfg.forms.clockin, p={usp:'pp_url'}; pl=pl||prefs;
@@ -437,7 +460,7 @@ function punch(type){
   var entry={id:uid(),ts:now.toISOString(),date:todayISO(now),time:nowHM(now),type:type,place:placeValue(),status:(mode==='iframe'?'pending':'unconfirmed')};
   entry.updatedAt=nowMs(); entry.device=deviceLabel();
   log.push(entry); saveLog(); lastEntryId=entry.id; lastType=type; lastPlace={place:prefs.place,other:prefs.other};
-  lockUntil=Date.now()+8000; setLocked(true); setTimeout(function(){ setLocked(false); },8000);
+  lockUntil=Date.now()+8000; setLocked(true); setTimeout(function(){ setLocked(false); renderStatus(); },8000);
   if(mode==='iframe'){
     var fields={}, token=fbzx();
     fields[f.reason]=TYPE_LABEL[type];
@@ -446,23 +469,24 @@ function punch(type){
     fields.fvv='1'; fields.pageHistory='0'; fields.fbzx=token; fields.partialResponse='[null,null,"'+token+'"]';
     var form=$('gform'); form.innerHTML=''; form.action=responseURL(f.url)+'?embedded=true'; form.target='gf';
     Object.keys(fields).forEach(function(k){ form.appendChild(el('input',{type:'hidden',name:k,value:fields[k]})); });
-    var fr=el('iframe',{name:'gf',class:'gf',title:'Google 表單回應'}), firstLoad=true, myId=entry.id;
+    var fr=el('iframe',{name:'gf',class:'gf',title:'Google 表單回應'}), firstLoad=true, myId=entry.id; inFlightId=myId;
     waitTimer=setTimeout(function(){ showErr('15 秒內沒有收到 Google 的畫面，可能沒有網路。這筆大概沒送到：請按「沒成功？刪除這筆」，連上網路後再打一次。'); },15000);
-    fr.addEventListener('load',function(){ if(firstLoad){ firstLoad=false; return; } clearTimeout(waitTimer); setStatus(myId,'sent'); $('result-err').hidden=true; });
+    fr.addEventListener('load',function(){ if(firstLoad){ firstLoad=false; return; } if(failedId===myId) return; clearTimeout(waitTimer); if(inFlightId===myId) inFlightId=null; setStatus(myId,'sent'); $('result-err').hidden=true; renderStatus(); });
     holder.appendChild(fr);
     form.submit();
     try{ fetch('https://docs.google.com/favicon.ico?'+Date.now(),{mode:'no-cors',cache:'no-store'}).then(null,function(){ clearTimeout(waitTimer); showErr('連不上 Google，這筆沒有送到。請按「沒成功？刪除這筆」，網路正常後再打一次。'); }); }catch(e){}
-    $('result-title').textContent='已送出 '+TYPE_LABEL[type]+' '+entry.time;
-    body.textContent='地點：'+entry.place+'。下面是 Google 的畫面，看到 Google 說已收到回覆（例如「我們已經收到你回覆的表單」）才算完成。如果下面是空白，或又出現整張表單、有紅字，代表沒送到 Google：按「沒成功？刪除這筆」，再用「改用表單網頁重打這筆」。';
+    $('result-title').textContent='沒送到 '+TYPE_LABEL[type]+' '+entry.time;
+    body.textContent='地點：'+entry.place+'。下面是 Google 的畫面，可以對照看看。';
   } else {
     var url=prefillURL(type,lastPlace), opened=openExternal(url);
     $('result-title').textContent='已開啟 '+TYPE_LABEL[type]+' '+entry.time;
     if(opened) body.textContent='地點：'+entry.place+'。表單已在 Safari 打開並預選好，請按「提交」。看到「已收到回覆」後，回來按下面的按鈕。';
     else { body.textContent='地點：'+entry.place+'。請按下面的「打開表單」，在 Safari 按「提交」，看到「已收到回覆」後回來按「我已在 Safari 按了提交」。'; openLink(holder,url,'打開表單'); }
     $('btn-confirm').hidden=false;
+    $('result-card').hidden=false; $('result-card').scrollIntoView({behavior:'smooth',block:'start'});
   }
-  $('result-card').hidden=false; renderStatus(); resetPlace();
-  $('result-card').scrollIntoView({behavior:'smooth',block:'start'});
+  if(mode==='iframe') $('result-card').hidden=true;
+  renderStatus(); resetPlace();
 }
 $('btn-in').addEventListener('click',function(){ punch('in'); });
 $('btn-out').addEventListener('click',function(){ punch('out'); });
