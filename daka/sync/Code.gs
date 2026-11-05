@@ -12,6 +12,7 @@
  * 忘記打卡提醒（給 iPhone 捷徑用）：
  *   網址/exec?token=同步密碼&check=in  → 今天打過上班卡了沒
  *   網址/exec?token=同步密碼&check=out → 今天打過下班卡了沒
+ *   網址/exec?token=同步密碼&check=auto → 自己判斷現在該看上班還是下班（一個捷徑就夠，時間點想加幾個都可以）
  *   回傳一行文字；需要提醒時文字裡會有「還沒」。週末、設定裡的放假日、請假時段會回「不用提醒」。
  *   下班檢查會看今天的上班卡：上班時間加上一天的工時（設定裡的下班減上班，預設 9 小時）之前不提醒。
  *   更新這份程式後要重新部署：部署 → 管理部署作業 → 編輯 → 版本選「新版本」→ 部署（網址不會變）。
@@ -32,9 +33,8 @@ function doGet(e) {
 
 function check_(p) {
   if (TOKEN === 'CHANGE_ME' || p.token !== TOKEN) return '同步密碼不對，請檢查捷徑裡的網址';
-  const type = p.check === 'out' ? 'out' : 'in';
   const now = new Date();
-  const today = Utilities.formatDate(now, TZ, 'yyyy-MM-dd');
+  const today = Utilities.formatDate(now, TZ, 'yyyy-MM-dd'), hm = Utilities.formatDate(now, TZ, 'HH:mm');
   if (Number(Utilities.formatDate(now, TZ, 'u')) >= 6) return '今天是週末，不用提醒';
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let cfg = null;
@@ -43,25 +43,31 @@ function check_(p) {
   cfg = cfg || {};
   if ((Array.isArray(cfg.offDays) ? cfg.offDays : []).indexOf(today) >= 0) return '今天放假，不用提醒';
   const ws = (cfg.work && cfg.work.start) || '09:00', we = (cfg.work && cfg.work.end) || '18:00';
-  const onLeave = (Array.isArray(cfg.leaveDays) ? cfg.leaveDays : []).some(function (l) {
-    return l && l.date === today && (type === 'in' ? l.start <= ws : l.end >= we);
-  });
-  if (onLeave) return '今天這段有請假，不用提醒';
+  const leaves = (Array.isArray(cfg.leaveDays) ? cfg.leaveDays : []).filter(function (l) { return l && l.date === today; });
   const todays = mergeLog_(sheet_(ss, LOG_SHEET, LOG_HEAD), []).filter(function (r) {
     return r.date === today && !r.deleted;
   });
-  if (todays.some(function (r) { return r.type === type; })) return '今天已打' + TYPE_LABEL[type] + '卡';
-  // 彈性上下班：今天有上班卡、又沒有請假時，做滿工時才提醒下班卡
-  const hasLeave = (Array.isArray(cfg.leaveDays) ? cfg.leaveDays : []).some(function (l) { return l && l.date === today; });
-  if (type === 'out' && !hasLeave) {
+  const has = function (type) { return todays.some(function (r) { return r.type === type; }); };
+  const leaveCovers = function (type) {
+    return leaves.some(function (l) { return type === 'in' ? l.start <= ws : l.end >= we; });
+  };
+  // 彈性上下班：今天有上班卡、又沒有請假時，做滿工時（含午休）才提醒下班卡
+  const outDue = function () {
     const ins = todays.filter(function (r) { return r.type === 'in' && /^\d\d:\d\d$/.test(r.time || ''); })
       .map(function (r) { return r.time; }).sort();
-    if (ins.length) {
-      const due = hm_(min_(ins[0]) + min_(we) - min_(ws));
-      if (Utilities.formatDate(now, TZ, 'HH:mm') < due) return '預計 ' + due + ' 下班，現在不用提醒';
-    }
-  }
-  return '還沒打' + TYPE_LABEL[type] + '卡！';
+    return (ins.length && !leaves.length) ? hm_(min_(ins[0]) + min_(we) - min_(ws)) : we;
+  };
+  const one = function (type) {
+    if (leaveCovers(type)) return '今天這段有請假，不用提醒';
+    if (has(type)) return '今天已打' + TYPE_LABEL[type] + '卡';
+    if (type === 'out' && hm < outDue()) return '預計 ' + outDue() + ' 下班，現在不用提醒';
+    return '還沒打' + TYPE_LABEL[type] + '卡！';
+  };
+  if (p.check !== 'auto') return one(p.check === 'out' ? 'out' : 'in');
+  // check=auto：同一個網址自己判斷。上班時間前半小時起看上班卡，打了上班卡（或這段請假）就看下班卡
+  if (hm < hm_(min_(ws) - 30)) return '上班時間前，不用提醒';
+  if (!has('in') && !leaveCovers('in')) return one('in');
+  return one('out');
 }
 
 function min_(hm) { const p = hm.split(':'); return Number(p[0]) * 60 + Number(p[1]); }
