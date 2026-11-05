@@ -100,6 +100,7 @@
   body.typing nav.tabs{display:none}
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 6px}
   .chip{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r);min-height:36px;padding:6px 14px;-webkit-tap-highlight-color:transparent}
+  .row .chips{flex-wrap:nowrap;gap:6px} .row .chip{flex:1;min-width:0;padding:6px 4px}
   .chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
   .hint{display:block;font-size:13px;color:var(--sub);margin-top:4px;min-height:18px}
   .hint.err{color:var(--danger);font-weight:600}
@@ -245,7 +246,7 @@
     <label class="f"><span>主管 Email</span><input id="cfg-sup-email" type="email" autocomplete="off" inputmode="email"></label>
     <label class="f"><span>HR 稱呼（例如：人資）</span><input id="cfg-hr-name" type="text"></label>
     <label class="f"><span>HR Email</span><input id="cfg-hr-email" type="email" autocomplete="off" inputmode="email"></label>
-    <label class="chk" style="margin-top:6px"><input id="cfg-cc-hr" type="checkbox"> 寄給主管時副本 HR（先問過 HR 再勾）</label>
+    <label class="chk" style="margin-top:6px"><input id="cfg-cc-hr" type="checkbox"> 寄給主管時副本給 HR</label>
     <div class="row">
       <label class="f"><span>上班時間（例如 0900）</span><input id="cfg-work-start" type="text" inputmode="numeric" autocomplete="off" placeholder="0900"></label>
       <label class="f"><span>下班時間（例如 1800）</span><input id="cfg-work-end" type="text" inputmode="numeric" autocomplete="off" placeholder="1800"></label>
@@ -299,7 +300,7 @@
   </div>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.22 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.23 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -580,17 +581,17 @@ function parseDateInput(v){
   if(dgt.length!==8){ var today=new Date(now.getFullYear(),now.getMonth(),now.getDate()); if((today-d)/86400000>60) d=new Date(y+1,mo-1,da); }
   return todayISO(d);
 }
-function chipOrder(key,defaults){
+function chipOrder(key,defaults,max){
   var cnt=freq[key]||{}, seen={}, list=[];
   Object.keys(cnt).concat(defaults).forEach(function(t){ if(!seen[t]&&/^\d\d:\d\d$/.test(t)){ seen[t]=1; list.push(t); } });
-  return list.sort(function(a,b){ return (cnt[b]||0)-(cnt[a]||0)||defaults.indexOf(a)-defaults.indexOf(b); }).slice(0,4);
+  return list.sort(function(a,b){ return (cnt[b]||0)-(cnt[a]||0)||defaults.indexOf(a)-defaults.indexOf(b); }).slice(0,max||4);
 }
 function bumpFreq(key,hm){ if(!hm) return; freq[key]=freq[key]||{}; freq[key][hm]=(freq[key][hm]||0)+1; save(KEY_FREQ,freq); }
-function timeField(id,label,key,value,defaults){
+function timeField(id,label,key,value,defaults,max){
   var inp=el('input',{id:id,type:'text',inputmode:'numeric',autocomplete:'off',placeholder:'例如 0930',value:value||''});
   var hint=el('span',{class:'hint'}), chips=el('div',{class:'chips'});
   function upd(){ var v=parseTimeInput(inp.value); hint.textContent=inp.value?(v?zhTime(v):'請輸入四位數，例如 0930 或 1630'):''; hint.className='hint'+(inp.value&&!v?' err':''); chips.querySelectorAll('.chip').forEach(function(c){ c.classList.toggle('on',c.textContent===v); }); }
-  chipOrder(key,defaults).forEach(function(t){ var c=el('button',{type:'button',class:'chip',text:t}); c.addEventListener('click',function(){ inp.value=t; upd(); }); chips.appendChild(c); });
+  chipOrder(key,defaults,max).forEach(function(t){ var c=el('button',{type:'button',class:'chip',text:t}); c.addEventListener('click',function(){ inp.value=t; upd(); }); chips.appendChild(c); });
   inp.addEventListener('input',upd);
   inp.addEventListener('blur',function(){ var v=parseTimeInput(inp.value); if(v) inp.value=v; upd(); });
   var w=el('div',{class:'f'},[el('span',{class:'small',text:label}),chips,inp,hint]); w.style.margin='10px 0 0';
@@ -660,8 +661,8 @@ function addLeaveDay(v){
   blk.appendChild(head);
   blk.appendChild(dateField('ap-date'+sfx,'請假日期',v.date));
   blk.appendChild(el('div',{class:'chips',style:'margin-top:10px'},[full]));
-  blk.appendChild(timeField('ap-start'+sfx,'起始時間','leave.start',v.start,[wh.ws,'13:00','14:00']));
-  blk.appendChild(timeField('ap-end'+sfx,'結束時間','leave.end',v.end,[wh.we,'12:00','17:00']));
+  blk.appendChild(el('div',{class:'row'},[timeField('ap-start'+sfx,'起始時間','leave.start',v.start,[wh.ws,'13:00','14:00'],2),
+    timeField('ap-end'+sfx,'結束時間','leave.end',v.end,[wh.we,'12:00','17:00'],2)]));
   blk.setAttribute('data-sfx',sfx);
   $('ap-days').appendChild(blk); relabelDays(); $('form-days').innerHTML='';
   return blk;
@@ -704,8 +705,8 @@ function renderApply(){
     note.textContent='請假要事先提出。寄信、填表單都做完，HR 才會處理。';
   } else if(kind==='overtime'){
     box.appendChild(dateField('ap-date','加班日期',todayISO()));
-    box.appendChild(timeField('ap-start','起始時間','overtime.start',we,[we,'18:30','19:00']));
-    box.appendChild(timeField('ap-end','結束時間','overtime.end',addHours(we,2),[addHours(we,2),addHours(we,1),addHours(we,3)]));
+    box.appendChild(el('div',{class:'row'},[timeField('ap-start','起始時間','overtime.start',we,[we,'18:30','19:00'],2),
+      timeField('ap-end','結束時間','overtime.end',addHours(we,2),[addHours(we,2),addHours(we,1),addHours(we,3)],2)]));
     box.appendChild(field('ap-reason','加班事由','text','',{placeholder:'例如：趕 10/20 的提案'}));
     var comps=strList(cfg&&cfg.forms&&cfg.forms.overtime&&cfg.forms.overtime.comps,['補休','加班費']).map(function(c){ return {v:c,t:c.split('(')[0]}; });
     box.appendChild(field('ap-comp','換抵方式','select',comps[0].v,comps));
@@ -715,8 +716,8 @@ function renderApply(){
     box.appendChild(field('ap-reason','活動或事由','text','',{placeholder:'例如：某某研討會'}));
     box.appendChild(dateField('ap-date','出發日',todayISO()));
     box.appendChild(dateField('ap-end-date','結束日',todayISO()));
-    box.appendChild(timeField('ap-start','起始時間','travel.start',ws,[ws,'08:00','13:00']));
-    box.appendChild(timeField('ap-end','結束時間','travel.end',we,[we,'17:00','12:00']));
+    box.appendChild(el('div',{class:'row'},[timeField('ap-start','起始時間','travel.start',ws,[ws,'08:00','13:00'],2),
+      timeField('ap-end','結束時間','travel.end',we,[we,'17:00','12:00'],2)]));
     var c2=el('input',{type:'checkbox',id:'ap-nooffice'}); c2.checked=true; box.appendChild(el('label',{class:'chk'},[c2,'不進辦公室']));
     box.appendChild(field('ap-transport','交通方式（選填）','text','',{placeholder:'例如：捷運、高鐵、自行開車'}));
     var tf=cfg&&cfg.forms&&cfg.forms.travel;
@@ -861,7 +862,7 @@ function fillApply(d){
 $('btn-mail').addEventListener('click',function(){
   var d=applyData(), err=validate(d); if(err){ alert(err); return; }
   if(!cfg||!cfg.supervisor||!cfg.supervisor.email){ showTab('settings'); toast('請先填主管 Email','err'); $('cfg-sup-email').focus(); return; }
-  var m=mailFor(d), to=cfg.supervisor.email, cc=(cfg.ccHr&&cfg.hr&&cfg.hr.email)?cfg.hr.email:'';
+  var m=mailFor(d), to=cfg.supervisor.email, cc=(cfg.ccHr!==false&&cfg.hr&&cfg.hr.email)?cfg.hr.email:'';
   var url='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body)+(cc?'&cc='+encodeURIComponent(cc):'');
   upsertReq(d); save(KEY_REQ,reqs); renderReqs(); recordUse(d);
   window.location.href=url;
@@ -870,7 +871,8 @@ $('btn-copy-mail').addEventListener('click',function(){
   var d=applyData(), err=validate(d); if(err){ alert(err); return; }
   var m=mailFor(d), to=(cfg&&cfg.supervisor&&cfg.supervisor.email)||'';
   upsertReq(d); save(KEY_REQ,reqs); renderReqs(); recordUse(d);
-  copyText((to?'收件者：'+to+'\n':'')+'主旨：'+m.subject+'\n\n'+m.body.replace(/\r\n/g,'\n'),'已複製信件內容，到 Outlook 新增郵件後貼上，主旨記得剪下貼到主旨欄。');
+  var cc=(cfg&&cfg.ccHr!==false&&cfg.hr&&cfg.hr.email)?cfg.hr.email:'';
+  copyText((to?'收件者：'+to+'\n':'')+(cc?'副本：'+cc+'\n':'')+'主旨：'+m.subject+'\n\n'+m.body.replace(/\r\n/g,'\n'),'已複製信件內容，到 Outlook 新增郵件後貼上，主旨記得剪下貼到主旨欄。');
 });
 $('btn-form').addEventListener('click',function(){
   var d=applyData(), err=validate(d); if(err){ alert(err); return; }
@@ -966,7 +968,7 @@ function renderSettings(){
   $('cfg-fullname').value=c.fullName||''; $('cfg-name').value=c.name||''; $('cfg-sender').value=c.senderEmail||'';
   $('cfg-sync-url').value=(c.sync&&c.sync.url)||''; $('cfg-sync-token').value=(c.sync&&c.sync.token)||''; renderSyncStatus();
   $('cfg-sup-title').value=(c.supervisor&&c.supervisor.title)||''; $('cfg-sup-email').value=(c.supervisor&&c.supervisor.email)||'';
-  $('cfg-hr-name').value=(c.hr&&c.hr.name)||''; $('cfg-hr-email').value=(c.hr&&c.hr.email)||''; $('cfg-cc-hr').checked=!!c.ccHr;
+  $('cfg-hr-name').value=(c.hr&&c.hr.name)||''; $('cfg-hr-email').value=(c.hr&&c.hr.email)||''; $('cfg-cc-hr').checked=c.ccHr!==false;
   $('cfg-work-start').value=normHM(c.work&&c.work.start,'09:00'); $('cfg-work-end').value=normHM(c.work&&c.work.end,'18:00');
   $('cfg-clockin-url').value=(c.forms&&c.forms.clockin&&c.forms.clockin.url)||''; $('cfg-clockin-desc').value=(c.forms&&c.forms.clockin&&c.forms.clockin.desc)||'';
   $('cfg-submit-mode').value=(c.submitMode==='tab'?'tab':'iframe');
@@ -989,6 +991,11 @@ function mergeGovHolidays(){
 }
 /* 放假日只會填未來的日子：四位數日期一律當成「下一次的那天」 */
 function parseFutureDate(v){ var iso=parseDateInput(v); if(iso&&iso<todayISO()&&String(v).replace(/\D/g,'').length<=4) iso=(+iso.slice(0,4)+1)+iso.slice(4); return iso; }
+/* 副本 HR 改成預設：舊設定存的是「不副本」，第一次遇到這版時打開一次，之後照使用者的選擇 */
+function migrateCcHr(){
+  if(!cfg||cfg.ccHrV===1) return;
+  cfg.ccHr=true; cfg.ccHrV=1; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); renderSettings(); scheduleSync();
+}
 function ymdText(iso){ return (iso.slice(0,4)!==String(new Date().getFullYear())?iso.slice(0,4)+'/':'')+fmtMD(iso); }
 function checkURL(type){ return cfg.sync.url+'?token='+encodeURIComponent(cfg.sync.token)+'&check='+type; }
 function renderRemind(){
@@ -1103,7 +1110,7 @@ $('btn-apply-code').addEventListener('click',function(){
   if(cfg.sync&&!(isSyncURL(cfg.sync.url)||!cfg.sync.url)) cfg.sync={url:'',token:''};
   if(cfg.sync&&!cfg.sync.url&&keep.sync&&isSyncURL(keep.sync.url)) cfg.sync={url:keep.sync.url,token:cfg.sync.token||keep.sync.token};
   cfg.updatedAt=nowMs();
-  ['submitMode','work','ccHr','offDays','leaveDays','holidaysV'].forEach(function(k){ if(cfg[k]==null&&keep[k]!=null) cfg[k]=keep[k]; });
+  ['submitMode','work','ccHr','ccHrV','offDays','leaveDays','holidaysV'].forEach(function(k){ if(cfg[k]==null&&keep[k]!=null) cfg[k]=keep[k]; });
   if(keep.supervisor&&keep.supervisor.email&&!(cfg.supervisor&&cfg.supervisor.email)) cfg.supervisor=keep.supervisor;
   if(keep.hr&&keep.hr.email&&!(cfg.hr&&cfg.hr.email)) cfg.hr=keep.hr;
   save(KEY_CFG,cfg); renderSettings(); renderStatus(); renderPlaces(); renderApply(); $('setup-code').value=''; syncNow(true);
@@ -1170,7 +1177,7 @@ function syncNow(force,soon){
     .then(function(res){
       if(!res||!res.ok) throw new Error(res&&res.error==='unauthorized'?'同步密碼不對':(res&&res.error)||'回應格式不對');
       var changed=mergeRemote(res);
-      setTimeout(mergeGovHolidays,0);
+      setTimeout(function(){ mergeGovHolidays(); migrateCcHr(); },0);
       /* 只把送出時的設定記為已同步；同步途中又改的設定，下次還會送 */
       var tookRemote=!!(res.config&&cfg.updatedAt===res.config.updatedAt&&cfg.updatedAt!==sentCfgAt);
       syncState={pushedAt:startedAt,configAt:tookRemote?cfg.updatedAt:Math.max(sentCfgAt,syncState.configAt||0),at:fmtDateLong(new Date())+' '+nowHM(),err:''};
@@ -1188,7 +1195,7 @@ renderHeader();
 try{ renderPlaces(); renderStatus(); renderApply(); renderReqs(); }
 catch(e){ showTab('settings'); toast('設定讀取失敗，請重新貼設定碼（'+e.message+'）','err'); }
 if(!cfg) showTab('settings');
-renderSyncStatus(); if(syncReady()) syncNow(true); else mergeGovHolidays();
+renderSyncStatus(); if(syncReady()) syncNow(true); else { mergeGovHolidays(); migrateCcHr(); }
 window.daka={version:'1.5',fillApply:fillApply,parseTimeInput:parseTimeInput,parseDateInput:parseDateInput,syncNow:syncNow,mailFor:mailFor,formURLFor:formURLFor,applyData:applyData};
 })();
 </script>
