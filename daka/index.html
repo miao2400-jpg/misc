@@ -23,12 +23,12 @@
     --line:#E7E4DD;--line-strong:#D6D3CB;
     --navy:#20374B;--navy-2:#2C4A63;--accent:#E7A93C;--safe:#3E7A55;--terra:#B4471F;--danger:#B23125;
     --warn-bg:#FFF4D6;--warn-ink:#6B4E00;--ok-bg:#E6F2EA;--ok-ink:#1F5234;--err-bg:#F8E3E0;--err-ink:#7A1F17;
-    --link:#20374B;--field:#8C8781;--dis-bg:#ECE9E2;--dis-ink:#66625C;
+    --link:#20374B;--soft:#F1EFEA;--field:#8C8781;--dis-bg:#ECE9E2;--dis-ink:#66625C;
     --r-lg:6px;--r:4px;--r-sm:2px;
   }
   @media (prefers-color-scheme: dark){
     :root{--bg:#141516;--card:#1E2022;--ink:#F1EFEA;--sub:#B5B0A8;--faint:#8C8781;--line:#2E3134;--line-strong:#3C4044;
-      --warn-bg:#3A2E0E;--warn-ink:#F3D38A;--ok-bg:#15301F;--ok-ink:#A9DCB9;--err-bg:#3B1A16;--err-ink:#F3B0A8;--danger:#F09B90;--link:#9DB2C4;--field:#77726B;--dis-bg:#2A2D30;--dis-ink:#A7A29A;--navy:#3F6A91;--navy-2:#4C7CA6;}
+      --warn-bg:#3A2E0E;--warn-ink:#F3D38A;--ok-bg:#15301F;--ok-ink:#A9DCB9;--err-bg:#3B1A16;--err-ink:#F3B0A8;--danger:#F09B90;--link:#9DB2C4;--soft:#2A2D30;--field:#77726B;--dis-bg:#2A2D30;--dis-ink:#A7A29A;--navy:#3F6A91;--navy-2:#4C7CA6;}
   }
   *{box-sizing:border-box;margin:0;padding:0}
   [hidden]{display:none!important}
@@ -105,6 +105,23 @@
   .hint{display:block;font-size:13px;color:var(--sub);margin-top:4px;min-height:18px}
   .hint.err{color:var(--danger);font-weight:600}
   .sync-ok{color:var(--safe)}
+  .fld{position:relative;flex:1;min-width:0}
+  .fld input{padding-right:84px}
+  .fld .in-hint{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--sub);pointer-events:none;white-space:nowrap}
+  .fld.cmp input{padding-right:48px}
+  .cal-fld:not(.cmp) input{padding-right:190px}
+  .cal-fld:not(.cmp) .in-hint{right:56px}
+  .in-hint .s{display:none}
+  @media (max-width:359px){ .row .in-hint .l{display:none} .row .in-hint .s{display:inline} .row .fld:not(.cmp) input{padding-right:46px} }
+  .fld .in-btn{position:absolute;right:0;top:0;bottom:0;width:46px;min-height:0;border:0;background:transparent}
+  .fld .in-btn[aria-expanded="true"]{background:var(--soft);color:var(--link);border-radius:0 var(--r) var(--r) 0}
+  .fld~.hint:empty,.date-row~.hint:empty{min-height:0;margin:0}
+  .sugg{display:flex;gap:6px;margin-top:6px;min-height:32px}
+  .pill{position:relative;font:inherit;font-size:14px;color:var(--link);background:var(--soft);border:0;border-radius:var(--r);min-height:32px;padding:4px 10px;-webkit-tap-highlight-color:transparent}
+  .pill::after{content:"";position:absolute;inset:-6px -3px}
+  .t-head{display:flex;justify-content:space-between;align-items:baseline;margin:12px 0 2px}
+  .t-head b{font-size:13px;font-weight:400;color:var(--sub)}
+  .linkbtn{font:inherit;font-size:14px;color:var(--link);background:none;border:0;padding:10px 0;text-decoration:underline;text-underline-offset:3px}
   .date-row{display:flex;gap:8px}
   .date-row input{flex:1;min-width:0}
   .icon-btn{flex:none;width:48px;min-height:44px;display:flex;align-items:center;justify-content:center;color:var(--link);background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r);-webkit-tap-highlight-color:transparent}
@@ -300,7 +317,7 @@
   </div>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.23 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.24 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -589,12 +606,17 @@ function chipOrder(key,defaults,max){
 function bumpFreq(key,hm){ if(!hm) return; freq[key]=freq[key]||{}; freq[key][hm]=(freq[key][hm]||0)+1; save(KEY_FREQ,freq); }
 function timeField(id,label,key,value,defaults,max){
   var inp=el('input',{id:id,type:'text',inputmode:'numeric',autocomplete:'off',placeholder:'例如 0930',value:value||''});
-  var hint=el('span',{class:'hint'}), chips=el('div',{class:'chips'});
-  function upd(){ var v=parseTimeInput(inp.value); hint.textContent=inp.value?(v?zhTime(v):'請輸入四位數，例如 0930 或 1630'):''; hint.className='hint'+(inp.value&&!v?' err':''); chips.querySelectorAll('.chip').forEach(function(c){ c.classList.toggle('on',c.textContent===v); }); }
-  chipOrder(key,defaults,max).forEach(function(t){ var c=el('button',{type:'button',class:'chip',text:t}); c.addEventListener('click',function(){ inp.value=t; upd(); }); chips.appendChild(c); });
+  var inHint=el('span',{class:'in-hint'}), err=el('span',{class:'hint'}), sugg=el('div',{class:'sugg'});
+  function upd(){
+    var v=parseTimeInput(inp.value);
+    inHint.innerHTML=''; if(v){ var z=zhTime(v); inHint.appendChild(el('span',{class:'l',text:z})); inHint.appendChild(el('span',{class:'s',text:z.split(' ')[0]})); } err.textContent=(inp.value&&!v)?'請輸入四位數，例如 0930 或 1630':''; err.className='hint'+(err.textContent?' err':'');
+    sugg.innerHTML='';
+    chipOrder(key,defaults,(max||2)+1).filter(function(t){ return t!==v; }).slice(0,max||2).forEach(function(t){
+      var c=el('button',{type:'button',class:'pill',text:t}); c.addEventListener('click',function(){ inp.value=t; upd(); }); sugg.appendChild(c); });
+  }
   inp.addEventListener('input',upd);
   inp.addEventListener('blur',function(){ var v=parseTimeInput(inp.value); if(v) inp.value=v; upd(); });
-  var w=el('div',{class:'f'},[el('span',{class:'small',text:label}),chips,inp,hint]); w.style.margin='10px 0 0';
+  var w=el('div',{class:'f'},[el('span',{class:'small',text:label}),el('div',{class:'fld'},[inp,inHint]),err,sugg]); w.style.margin='4px 0 0';
   setTimeout(upd,0); return w;
 }
 /* 小月曆：手打日期之外的第二種輸入。週末與放假日用紅字加小圓點標出（不只靠顏色） */
@@ -636,14 +658,18 @@ function calendar(o){
   return api;
 }
 function calButton(label){ var b=el('button',{type:'button',class:'icon-btn','aria-label':label}); b.innerHTML=CAL_ICON; return b; }
-function dateField(id,label,iso){
+function dateField(id,label,iso,compact){
   var inp=el('input',{id:id,type:'text',inputmode:'numeric',autocomplete:'off',placeholder:'例如 1020',value:iso?mmdd(iso):''});
-  var hint=el('span',{class:'hint'}), btn=calButton('用月曆選'+label);
-  function upd(){ var v=parseDateInput(inp.value); hint.textContent=inp.value?(v?(v.slice(0,4)!==String(new Date().getFullYear())?v.slice(0,4)+'/':'')+fmtDWk(v)+(GOV_NAMES[v]?' '+GOV_NAMES[v]:''):'請輸入四位數，例如 1020'):''; hint.className='hint'+(inp.value&&!v?' err':''); }
+  var hint=el('span',{class:'hint'}), inHint=el('span',{class:'in-hint'}), btn=calButton('用月曆選'+label);
+  function upd(){ var v=parseDateInput(inp.value);
+    if(compact){ inHint.textContent=''; hint.textContent=inp.value?(v?fmtMD(v)+(GOV_NAMES[v]?' '+GOV_NAMES[v]:''):'要四位數，如 1020'):''; hint.className='hint'+(inp.value&&!v?' err':''); return; }
+    inHint.textContent=v?((v.slice(0,4)!==String(new Date().getFullYear())?v.slice(0,4)+'/':'')+fmtDWk(v)+(GOV_NAMES[v]?' '+GOV_NAMES[v]:'')):''; hint.textContent=(inp.value&&!v)?'請輸入四位數，例如 1020':''; hint.className='hint'+(hint.textContent?' err':''); }
   var cal=calendar({btn:btn,isSelected:function(x){ return parseDateInput(inp.value)===x; },onPick:function(x){ inp.value=dateText(x); inp.dispatchEvent(new Event('input',{bubbles:true})); btn.focus(); }});
   btn.addEventListener('click',function(){ cal.toggle(parseDateInput(inp.value)); });
   inp.addEventListener('input',upd);
-  var w=el('div',{class:'f'},[el('span',{class:'small',text:label}),el('div',{class:'date-row'},[inp,btn]),hint,cal.el]); w.style.margin='10px 0 0';
+  btn.classList.add('in-btn');
+  var w=el('div',{class:'f'},[el('span',{class:'small',text:label}),el('div',{class:'fld cal-fld'+(compact?' cmp':'')},compact?[inp,btn]:[inp,inHint,btn]),hint]); w.style.margin='10px 0 0';
+  if(compact) w.calEl=cal.el; else w.appendChild(cal.el);
   setTimeout(upd,0); return w;
 }
 /* 請假可以一次請多天：每一天有自己的日期與時間，假別、事由共用。第一天沿用 ap-date / ap-start / ap-end */
@@ -656,13 +682,13 @@ function addLeaveDay(v){
   var n=++daySeq, sfx=(n===1?'':'-'+n), wh=workHours();
   var blk=el('div',{class:'day'}), head=el('div',{class:'day-head'},[el('b',{class:'day-label'})]);
   if(n>1){ var x=el('button',{type:'button',class:'day-x',text:'移除這天'}); x.addEventListener('click',function(){ blk.remove(); relabelDays(); $('form-days').innerHTML=''; }); head.appendChild(x); }
-  var full=el('button',{type:'button',class:'chip',text:'全天'});
+  var full=el('button',{type:'button',class:'linkbtn',text:'全天 '+wh.ws+'–'+wh.we});
   full.addEventListener('click',function(){ setVal('ap-start'+sfx,wh.ws); setVal('ap-end'+sfx,wh.we); });
   blk.appendChild(head);
   blk.appendChild(dateField('ap-date'+sfx,'請假日期',v.date));
-  blk.appendChild(el('div',{class:'chips',style:'margin-top:10px'},[full]));
-  blk.appendChild(el('div',{class:'row'},[timeField('ap-start'+sfx,'起始時間','leave.start',v.start,[wh.ws,'13:00','14:00'],2),
-    timeField('ap-end'+sfx,'結束時間','leave.end',v.end,[wh.we,'12:00','17:00'],2)]));
+  blk.appendChild(el('div',{class:'t-head'},[el('b',{text:'時間'}),full]));
+  blk.appendChild(el('div',{class:'row'},[timeField('ap-start'+sfx,'起始','leave.start',v.start,[wh.ws,'13:00','14:00'],2),
+    timeField('ap-end'+sfx,'結束','leave.end',v.end,[wh.we,'12:00','17:00'],2)]));
   blk.setAttribute('data-sfx',sfx);
   $('ap-days').appendChild(blk); relabelDays(); $('form-days').innerHTML='';
   return blk;
@@ -705,19 +731,21 @@ function renderApply(){
     note.textContent='請假要事先提出。寄信、填表單都做完，HR 才會處理。';
   } else if(kind==='overtime'){
     box.appendChild(dateField('ap-date','加班日期',todayISO()));
-    box.appendChild(el('div',{class:'row'},[timeField('ap-start','起始時間','overtime.start',we,[we,'18:30','19:00'],2),
-      timeField('ap-end','結束時間','overtime.end',addHours(we,2),[addHours(we,2),addHours(we,1),addHours(we,3)],2)]));
+    box.appendChild(el('div',{class:'t-head'},[el('b',{text:'時間'})]));
+    box.appendChild(el('div',{class:'row'},[timeField('ap-start','起始','overtime.start',we,[we,'18:30','19:00'],2),
+      timeField('ap-end','結束','overtime.end',addHours(we,2),[addHours(we,2),addHours(we,1),addHours(we,3)],2)]));
     box.appendChild(field('ap-reason','加班事由','text','',{placeholder:'例如：趕 10/20 的提案'}));
     var comps=strList(cfg&&cfg.forms&&cfg.forms.overtime&&cfg.forms.overtime.comps,['補休','加班費']).map(function(c){ return {v:c,t:c.split('(')[0]}; });
     box.appendChild(field('ap-comp','換抵方式','select',comps[0].v,comps));
     note.textContent='加班要事先讓主管同意。';
   } else {
-    box.appendChild(field('ap-dest','地點','text','',{placeholder:'例如：台北某大樓'}));
     box.appendChild(field('ap-reason','活動或事由','text','',{placeholder:'例如：某某研討會'}));
-    box.appendChild(dateField('ap-date','出發日',todayISO()));
-    box.appendChild(dateField('ap-end-date','結束日',todayISO()));
-    box.appendChild(el('div',{class:'row'},[timeField('ap-start','起始時間','travel.start',ws,[ws,'08:00','13:00'],2),
-      timeField('ap-end','結束時間','travel.end',we,[we,'17:00','12:00'],2)]));
+    box.appendChild(field('ap-dest','地點','text','',{placeholder:'例如：台北某大樓'}));
+    var d1=dateField('ap-date','出發日',todayISO(),true), d2=dateField('ap-end-date','結束日',todayISO(),true);
+    box.appendChild(el('div',{class:'row'},[d1,d2])); box.appendChild(d1.calEl); box.appendChild(d2.calEl);
+    box.appendChild(el('div',{class:'t-head'},[el('b',{text:'時間'})]));
+    box.appendChild(el('div',{class:'row'},[timeField('ap-start','起始','travel.start',ws,[ws,'08:00','13:00'],2),
+      timeField('ap-end','結束','travel.end',we,[we,'17:00','12:00'],2)]));
     var c2=el('input',{type:'checkbox',id:'ap-nooffice'}); c2.checked=true; box.appendChild(el('label',{class:'chk'},[c2,'不進辦公室']));
     box.appendChild(field('ap-transport','交通方式（選填）','text','',{placeholder:'例如：捷運、高鐵、自行開車'}));
     var tf=cfg&&cfg.forms&&cfg.forms.travel;
