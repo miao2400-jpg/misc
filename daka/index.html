@@ -46,7 +46,7 @@
   .card h2{font-size:15px;font-weight:600;color:var(--sub);margin-bottom:8px}
   .status{display:flex;gap:12px}
   .status div{flex:1;text-align:center;padding:8px 4px;border-radius:var(--r);background:var(--bg)}
-  .status .lbl{font-size:13px;color:var(--sub)}
+  .status .lbl{font-size:14px;color:var(--sub)}
   .status .val{font-size:24px;font-weight:700;letter-spacing:.02em}
   .status .val.empty{color:var(--faint);font-weight:500}
   .seg{display:flex;border:1px solid var(--field);border-radius:var(--r);overflow:hidden}
@@ -58,25 +58,29 @@
   select{-webkit-appearance:none;appearance:none;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M3 6l5 5 5-5' fill='none' stroke='%238C8781' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
   textarea{min-height:90px;font-family:ui-monospace,Menlo,monospace;font-size:16px;line-height:1.3}
   label.f{display:block;margin:10px 0 0}
-  label.f span{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+  label.f span{display:block;font-size:14px;color:var(--sub);margin-bottom:4px}
   .row{display:flex;gap:10px}
   .row>*{flex:1;min-width:0}
   .big{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 6px}
   .big button{font:inherit;font-size:26px;font-weight:700;color:#fff;border:0;border-radius:var(--r-lg);padding:26px 8px;letter-spacing:.06em;-webkit-tap-highlight-color:transparent}
   .big .in{background:var(--safe)} .big .out{background:var(--navy)}
+  .big button.arm{background:var(--warn-bg);color:var(--warn-ink);box-shadow:inset 0 0 0 1.5px var(--warn-ink);font-size:22px;padding:14px 6px;line-height:1.3}
+  .big button .sub{display:block;font-size:14px;font-weight:500;letter-spacing:0;margin-top:2px}
+  .badge.due{font-weight:500;color:var(--sub);padding:2px 0}
+  .badge.due.reached{color:var(--ok-ink);font-weight:700}
   .big button.ghost{background:var(--card);color:var(--link);box-shadow:inset 0 0 0 1.5px var(--navy)}
   @media (prefers-color-scheme: dark){ .big button.ghost{box-shadow:inset 0 0 0 1.5px var(--link)} }
   .big button:disabled{background:var(--dis-bg);color:var(--dis-ink);box-shadow:none}
   .big button.done,.big button.done:disabled{background:var(--ok-bg);color:var(--ok-ink);box-shadow:none;font-size:20px}
   .lock-note{text-align:center;margin:2px 0 4px}
-  .badge{display:inline-block;font-size:13px;font-weight:700;padding:2px 8px;border-radius:var(--r-sm);margin-top:6px}
+  .badge{display:inline-block;font-size:14px;font-weight:700;padding:2px 8px;border-radius:var(--r-sm);margin-top:6px}
   .badge.ok{background:var(--ok-bg);color:var(--ok-ink)} .badge.warn{background:var(--warn-bg);color:var(--warn-ink)}
   .btn{display:inline-block;font:inherit;font-size:16px;font-weight:600;color:var(--link);background:transparent;border:1px solid var(--line-strong);border-radius:var(--r);min-height:44px;padding:10px 14px;text-align:center;text-decoration:none;-webkit-tap-highlight-color:transparent}
   .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
   .btn.danger{color:var(--danger);border-color:var(--danger)}
   .btn.block{display:block;width:100%;margin-top:10px}
   .btn:disabled{background:var(--dis-bg);color:var(--dis-ink);border-color:var(--dis-bg)}
-  .small{font-size:13px;color:var(--sub)}
+  .small{font-size:14px;color:var(--sub)}
   .small.err{color:var(--danger);font-weight:600}
   .small.err::before,.hint.err::before{content:"！ "}
   .banner{border-radius:var(--r);padding:10px 12px;font-size:14px;margin:10px 0}
@@ -96,19 +100,26 @@
   .tag::before{content:"！ "}
   .chk{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--sub);min-height:44px}
   .chk input{width:22px;height:22px;flex:0 0 auto}
+  #undo-bar{position:fixed;left:16px;right:16px;z-index:20;display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--bg);border-radius:var(--r);padding:6px 6px 6px 14px;font-size:15px;box-shadow:0 4px 16px rgba(0,0,0,.18);max-width:608px;margin:0 auto}
+  #undo-bar[hidden]{display:none}
+  #undo-bar span{flex:1;min-width:0}
+  #undo-bar button{flex:none;font:inherit;font-weight:700;color:inherit;background:transparent;border:0;min-height:44px;padding:0 12px;text-decoration:underline;text-underline-offset:3px}
   nav.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
   body.typing nav.tabs{display:none}
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 6px}
   .chip{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--r);min-height:36px;padding:6px 14px;-webkit-tap-highlight-color:transparent}
   .row .chips{flex-wrap:nowrap;gap:6px} .row .chip{flex:1;min-width:0;padding:6px 4px}
   .chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
-  .hint{display:block;font-size:13px;color:var(--sub);margin-top:4px;min-height:18px}
+  .hint{display:block;font-size:14px;color:var(--sub);margin-top:4px;min-height:18px}
   .hint.err{color:var(--danger);font-weight:600}
   .sync-ok{color:var(--safe)}
   .fld{position:relative;flex:1;min-width:0}
   .fld input{padding-right:84px}
-  .fld .in-hint{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--sub);pointer-events:none;white-space:nowrap}
+  .fld .in-hint{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--sub);pointer-events:none;white-space:nowrap}
   .fld.cmp input{padding-right:48px}
+  input.masked{-webkit-text-security:disc;text-security:disc}
+  .mask-fld input{padding-right:64px}
+  .mask-fld .in-reveal{position:absolute;right:12px;top:0;bottom:0;padding:0 4px;min-width:44px}
   .cal-fld:not(.cmp) input{padding-right:190px}
   .cal-fld:not(.cmp) .in-hint{right:56px}
   .in-hint .s{display:none}
@@ -120,7 +131,7 @@
   .pill{position:relative;font:inherit;font-size:14px;color:var(--link);background:var(--soft);border:0;border-radius:var(--r);min-height:32px;padding:4px 10px;-webkit-tap-highlight-color:transparent}
   .pill::after{content:"";position:absolute;inset:-6px -3px}
   .t-head{display:flex;justify-content:space-between;align-items:baseline;margin:12px 0 2px}
-  .t-head b{font-size:13px;font-weight:400;color:var(--sub)}
+  .t-head b{font-size:14px;font-weight:400;color:var(--sub)}
   .linkbtn{font:inherit;font-size:14px;color:var(--link);background:none;border:0;padding:10px 0;text-decoration:underline;text-underline-offset:3px}
   .date-row{display:flex;gap:8px}
   .date-row input{flex:1;min-width:0}
@@ -132,17 +143,28 @@
   .cal-head b{font-size:16px}
   .cal-nav{width:44px;height:44px;font:inherit;font-size:22px;line-height:1;color:var(--link);background:transparent;border:0;border-radius:var(--r)}
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
-  .cal-wd{font-size:13px;color:var(--sub);padding:2px 0 4px}
+  .cal-wd{font-size:14px;color:var(--sub);padding:2px 0 4px}
   .cal-wd.off{color:var(--danger)}
   .cal-d{position:relative;min-height:42px;font:inherit;font-size:16px;color:var(--ink);background:transparent;border:0;border-radius:var(--r);-webkit-tap-highlight-color:transparent}
   .cal-d.off{color:var(--danger)}
   .cal-d.hol::after{content:"";position:absolute;left:50%;bottom:5px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:currentColor}
   .cal-d.today{box-shadow:inset 0 0 0 1.5px var(--navy)}
   .cal-d.sel{background:var(--navy);color:#fff}
-  .cal-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font-size:13px;color:var(--sub)}
+  .cal-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font-size:14px;color:var(--sub)}
   .cal-foot button{font:inherit;font-size:14px;color:var(--link);background:transparent;border:0;min-height:44px;padding:0 6px}
+  details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;gap:10px;min-height:44px;margin:-4px 0}
+  details.fold>summary::-webkit-details-marker{display:none}
+  details.fold>summary h2{margin:0}
+  details.fold>summary::after{content:"";margin-left:auto;align-self:center;width:8px;height:8px;border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(45deg);transition:transform .15s}
+  details.fold[open]>summary::after{transform:rotate(-135deg)}
+  details.fold[open]>summary{margin-bottom:10px}
+  .topic{display:flex;align-items:center;gap:8px;margin:6px 0 2px}
+  .topic code{flex:1;min-width:0;overflow-wrap:anywhere;font-family:ui-monospace,Menlo,monospace;font-size:16px;background:var(--soft);border-radius:var(--r-sm);padding:8px 10px}
+  .topic .btn{flex:none}
+  ol.steps{padding-left:1.4em;margin:8px 0 0} ol.steps li{margin:0 0 10px}
+  .push-res{margin-top:8px}
   .sub-h{font-size:15px;font-weight:700;margin:16px 0 2px}
-  .off-year{font-size:13px;font-weight:700;color:var(--sub);margin:10px 0 0}
+  .off-year{font-size:14px;font-weight:700;color:var(--sub);margin:10px 0 0}
   .off-list li{display:flex;align-items:center;gap:8px;min-height:44px;border-top:1px solid var(--line);list-style:none}
   .off-list .d{flex:none;width:6.6em;font-variant-numeric:tabular-nums}
   .off-list .n{flex:1;min-width:0;font-size:14px;color:var(--sub)}
@@ -236,24 +258,27 @@
 <!-- ───────── 紀錄 ───────── -->
 <section id="tab-log" hidden>
   <div class="card">
-    <h2>打卡紀錄（只存在這支手機）</h2>
+    <h2>打卡紀錄</h2>
+    <p class="small" id="log-where" style="margin:-4px 0 8px">只存在這支手機。</p>
     <ul class="list" id="log-list"></ul>
     <p class="small muted" id="log-empty">還沒有紀錄。</p>
     <button class="btn block" id="btn-csv">複製成 CSV</button>
   </div>
 </section>
 
+<div id="undo-bar" role="status" aria-live="polite" hidden></div>
+
 <!-- ───────── 設定 ───────── -->
 <section id="tab-settings" hidden>
-  <div class="card">
-    <h2>設定碼</h2>
+  <details class="card fold" id="code-card">
+    <summary><h2>設定碼</h2><span class="small">換手機、重新設定時才用</span></summary>
     <textarea id="setup-code" placeholder="把設定碼貼在這裡，再按「套用」" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
     <div class="row" style="margin-top:8px">
       <button class="btn primary" id="btn-apply-code">套用</button>
       <button class="btn" id="btn-export-code">匯出目前設定</button>
     </div>
     <div id="code-msg" class="small" style="margin-top:8px" role="status" aria-live="polite"></div>
-  </div>
+  </details>
   <div class="card">
     <h2>我與公司</h2>
     <label class="f"><span>我的全名（信件主旨用，例如：王小明）</span><input id="cfg-fullname" type="text" autocomplete="name"></label>
@@ -272,7 +297,8 @@
   <div class="card">
     <h2>跨裝置同步（用你自己的 Google 試算表）</h2>
     <label class="f"><span>同步網址（Apps Script 部署後的網址，結尾是 /exec）</span><input id="cfg-sync-url" type="url" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
-    <label class="f"><span>同步密碼</span><input id="cfg-sync-token" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <label class="f"><span>同步密碼</span></label>
+    <div class="fld mask-fld"><input id="cfg-sync-token" class="masked" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="同步密碼"><button type="button" class="linkbtn in-reveal" id="btn-reveal-token" aria-pressed="false">顯示</button></div>
     <button class="btn block" id="btn-sync-now">立即同步</button>
     <p class="small" id="sync-status" style="margin-top:8px">尚未設定同步。</p>
   </div>
@@ -289,15 +315,17 @@
     <button class="btn block" id="btn-test-open">用表單網頁試開一次（不會送出）</button>
   </div>
   <div class="card">
-    <h2>忘記打卡提醒（iPhone 捷徑）</h2>
-    <p class="small">捷徑在你設定的時間問同步試算表「現在該打的卡打了沒」，沒打才跳通知。週末、下面的放假日、申請頁送出的請假時段都會自動跳過。</p>
-    <div id="remind-box"></div>
+    <h2>忘記打卡提醒</h2>
+    <p class="small">上班時間到了還沒有上班卡、應下班時間到了還沒有下班卡，手機就會跳通知，每 30 分鐘一次，最晚到 22:00。週末、放假日、請假時段不提醒；有加班申請時照加班時間提醒。</p>
+    <div id="push-box"></div>
     <h3 class="sub-h">不用提醒的日子</h3>
     <p class="small">已內建 2026–2027 國定假日。公司另外放假的日子在這裡加入。</p>
     <div id="off-add"></div>
     <div id="off-list"></div>
-    <details>
-      <summary>捷徑設定步驟</summary>
+    <details class="old-way">
+      <summary>改用 iPhone 捷徑（舊做法）</summary>
+      <p>已經設好推播的話，捷徑的自動化可以刪掉，不然同一件事會收到兩次通知。</p>
+      <div id="remind-box"></div>
       <p><b>先做一個捷徑</b>（「捷徑」App 下方的「捷徑」分頁）：</p>
       <ol>
         <li>右上角「＋」，命名「打卡檢查」。</li>
@@ -317,7 +345,7 @@
   </div>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.25 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.26 · 紀錄與設定存在這支手機；有設定同步的話，也會存一份到你自己的 Google 試算表。打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -383,7 +411,7 @@ function hasForm(name){ return formComplete(name, cfg&&cfg.forms&&cfg.forms[name
 function responseURL(viewUrl){ return viewUrl.replace(/\/viewform.*$/,'/formResponse'); }
 function fbzx(){ var s='-'; for(var i=0;i<19;i++){ s+=(i===0?1+Math.floor(Math.random()*9):Math.floor(Math.random()*10)); } return s; }
 function qs(obj){ return Object.keys(obj).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(obj[k]); }).join('&'); }
-function toast(msg,kind){ var b=$('code-msg'); b.textContent=msg; b.className='small '+(kind||''); }
+function toast(msg,kind){ var cc=$('code-card'); if(cc) cc.open=true; var b=$('code-msg'); b.textContent=msg; b.className='small '+(kind||''); }
 function strList(raw,fallback){ var l=Array.isArray(raw)?raw.filter(function(x){ return typeof x==='string'&&x.trim(); }):[]; return l.length?l:fallback; }
 var inSafari=(navigator.standalone===false);
 var inAppBrowser=inSafari&&/\bLine\/|FBAN|FBAV|Messenger|Instagram|GSA\/|MicroMessenger/i.test(navigator.userAgent);
@@ -422,9 +450,36 @@ function resetPlace(){ prefs.place=''; prefs.other=''; renderPlaces(); }
 function liveLog(){ return log.filter(function(r){ return !r.deleted; }); }
 function nowMs(){ return Date.now(); }
 function saveLog(){ save(KEY_LOG,log); scheduleSync(); }
+function restoreEntry(id){ log.forEach(function(r){ if(r.id===id){ delete r.deleted; r.updatedAt=nowMs(); } }); saveLog(); }
+/* 刪除後 6 秒內可以復原，取代「確定刪除？」視窗 */
+var undoTimer=null;
+function undoBar(msg,onUndo){
+  var b=$('undo-bar'), nav=document.querySelector('nav.tabs');
+  b.innerHTML=''; b.appendChild(el('span',{text:msg}));
+  var u=el('button',{type:'button',text:'復原'}); u.addEventListener('click',function(){ clearTimeout(undoTimer); b.hidden=true; onUndo(); }); b.appendChild(u);
+  b.style.bottom=((nav&&nav.offsetHeight)||56)+8+'px'; b.hidden=false;
+  clearTimeout(undoTimer); undoTimer=setTimeout(function(){ b.hidden=true; },6000);
+}
 function removeEntry(id){ log.forEach(function(r){ if(r.id===id){ r.deleted=true; r.updatedAt=nowMs(); } }); saveLog(); }
 function todayEntries(){ var t=todayISO(); return liveLog().filter(function(r){ return r.date===t; }); }
 function renderHeader(){ $('hdr-date').textContent=fmtMD(todayISO()); }
+/* 應下班時間：今天最早的上班卡 + 一天的工時（設定的下班減上班，含午休）；今天有請假就用設定的下班時間。和提醒用同一套算法 */
+function leaveToday(){ var t=todayISO(); return ((cfg&&cfg.leaveDays)||[]).some(function(l){ return l&&l.date===t; }); }
+function dueOut(){
+  var ins=todayEntries().filter(function(r){ return r.type==='in'&&/^\d\d:\d\d$/.test(r.time||''); }).map(function(r){ return r.time; }).sort();
+  if(!ins.length) return null;
+  var w=workHours(); if(leaveToday()) return w.we;
+  var m=Math.min(toMin(ins[0])+toMin(w.we)-toMin(w.ws),23*60+59); return pad(Math.floor(m/60))+':'+pad(m%60);
+}
+function workSpanText(){ var w=workHours(), m=toMin(w.we)-toMin(w.ws); return (m%60?(m/60).toFixed(1):m/60)+' 小時'; }
+/* 未滿工時按下班要再按一次。今天有請假、地點選「其他」（已寫原因）、今天沒有上班卡或已打過下班時不攔 */
+function outNeedsConfirm(){
+  var t=todayEntries(), d=dueOut();
+  if(!d||leaveToday()||prefs.place==='其他') return null;
+  if(t.some(function(r){ return r.type==='out'; })) return null;
+  return nowHM()<d?d:null;
+}
+var outArmUntil=0, outArmTimer=null;
 function renderStatus(){
   var t=todayEntries(), ins=t.filter(function(r){return r.type==='in';}), outs=t.filter(function(r){return r.type==='out';});
   var si=$('st-in'), so=$('st-out');
@@ -441,6 +496,11 @@ function renderStatus(){
   var bi=$('btn-in'), bo=$('btn-out'), justIn=locked&&cur&&cur.type==='in', justOut=locked&&cur&&cur.type==='out';
   bi.className='in'+(ins.length?' done':''); bi.textContent=justIn?'✓ 已送出':ins.length?'✓ 上班':'上班';
   bo.className='out'+(outs.length?' done':ins.length?'':' ghost'); bo.textContent=justOut?'✓ 已送出':outs.length?'✓ 下班':'下班';
+  var armD=Date.now()<outArmUntil&&outNeedsConfirm();
+  if(armD){ bo.className='out arm'; bo.textContent='再按一次下班'; bo.appendChild(el('span',{class:'sub',text:'未滿 '+workSpanText()})); bo.appendChild(el('span',{class:'sub',text:'應 '+armD+' 下班'})); }
+  else outArmUntil=0;
+  var od=$('st-out-badge'), due=!outs.length&&dueOut();
+  if(due&&od.style.visibility==='hidden'){ var ok=nowHM()>=due; od.textContent=ok?'✓ 已滿 '+workSpanText():'應下班 '+due; od.className='badge due'+(ok?' reached':''); od.style.visibility=''; }
   $('lock-note').hidden=!locked;
   $('banner-config').hidden=hasForm('clockin');
   var bp=$('banner-pending'); bp.hidden=true;
@@ -508,7 +568,13 @@ function punch(type){
   renderStatus(); resetPlace();
 }
 $('btn-in').addEventListener('click',function(){ punch('in'); });
-$('btn-out').addEventListener('click',function(){ punch('out'); });
+$('btn-out').addEventListener('click',function(){
+  if(Date.now()>=lockUntil&&Date.now()>=outArmUntil&&outNeedsConfirm()){
+    outArmUntil=Date.now()+3000; clearTimeout(outArmTimer); outArmTimer=setTimeout(function(){ outArmUntil=0; renderStatus(); },3000); renderStatus(); return;
+  }
+  outArmUntil=0; clearTimeout(outArmTimer); punch('out');
+});
+setInterval(function(){ if(!document.hidden) renderStatus(); },60000);
 $('btn-trip').addEventListener('click',function(){ punch('trip'); });
 $('btn-confirm').addEventListener('click',function(){
   setStatus(lastEntryId,'confirmed');
@@ -969,6 +1035,7 @@ function renderReqs(){
 /* ───────── 紀錄 ───────── */
 var STATUS_LABEL={unconfirmed:'未確認提交',pending:'未收到 Google 回應'};
 function renderLog(){
+  $('log-where').textContent=syncReady()?'存在這支手機，也同步到你的 Google 試算表。':'只存在這支手機。';
   var ul=$('log-list'), live=liveLog(); ul.innerHTML=''; $('log-empty').hidden=live.length>0;
   live.slice().sort(function(a,b){ return a.ts<b.ts?-1:1; }).reverse().slice(0,120).forEach(function(r){
     var li=el('li'), t=el('div',{class:'t'});
@@ -978,7 +1045,7 @@ function renderLog(){
     t.appendChild(el('div',{class:'small',text:r.place}));
     li.appendChild(t);
     if(STATUS_LABEL[r.status]){ var ok=el('button',{class:'x',text:'已提交',style:'color:var(--safe)'}); ok.addEventListener('click',function(){ setStatus(r.id,'confirmed'); renderLog(); renderStatus(); }); li.appendChild(ok); }
-    var x=el('button',{class:'x',text:'刪除'}); x.addEventListener('click',function(){ if(confirm('刪除這筆紀錄？（Google 表單那邊不會被刪）')){ removeEntry(r.id); renderLog(); renderStatus(); } });
+    var x=el('button',{class:'x',text:'刪除'}); x.addEventListener('click',function(){ removeEntry(r.id); renderLog(); renderStatus(); undoBar('已刪除 '+r.date.slice(5).replace('-','/')+' '+r.time+' '+(TYPE_LABEL[r.type]||r.type)+'（Google 表單那邊不受影響）',function(){ restoreEntry(r.id); renderLog(); renderStatus(); }); });
     li.appendChild(x); ul.appendChild(li);
   });
 }
@@ -1001,7 +1068,7 @@ function renderSettings(){
   $('cfg-work-start').value=normHM(c.work&&c.work.start,'09:00'); $('cfg-work-end').value=normHM(c.work&&c.work.end,'18:00');
   $('cfg-clockin-url').value=(c.forms&&c.forms.clockin&&c.forms.clockin.url)||''; $('cfg-clockin-desc').value=(c.forms&&c.forms.clockin&&c.forms.clockin.desc)||'';
   $('cfg-submit-mode').value=(c.submitMode==='tab'?'tab':'iframe');
-  renderRemind(); renderOffDays();
+  renderRemind(); renderPush(); renderOffDays();
 }
 /* 忘記打卡提醒：給 iPhone 捷徑的檢查網址，與不用提醒的日子 */
 /* 政府行政機關辦公日曆表（115、116 年）裡落在平日的放假日；週末本來就不提醒。換年時更新這份清單與 HOLIDAYS_V */
@@ -1027,6 +1094,43 @@ function migrateCcHr(){
 }
 function ymdText(iso){ return (iso.slice(0,4)!==String(new Date().getFullYear())?iso.slice(0,4)+'/':'')+fmtMD(iso); }
 function checkURL(type){ return cfg.sync.url+'?token='+encodeURIComponent(cfg.sync.token)+'&check='+type; }
+/* 推播提醒（ntfy）：主題名稱和按鈕鑰匙在第一次同步完後產生，存在設定裡同步到試算表，讓 Apps Script 知道要推到哪裡 */
+function randStr(n){ var a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789', b=new Uint8Array(n), s=''; crypto.getRandomValues(b); for(var i=0;i<n;i++) s+=a[b[i]%a.length]; return s; }
+function ensurePush(){
+  if(!cfg||!syncReady()||(cfg.push&&cfg.push.topic&&cfg.push.key)) return;
+  cfg.push={topic:'daka-'+randStr(16),key:randStr(24)}; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); scheduleSync(); renderPush();
+}
+function renderPush(){
+  var box=$('push-box'); if(!box) return; box.innerHTML='';
+  if(!syncReady()){ box.appendChild(el('p',{class:'small err',text:'要先設定上面的跨裝置同步，才能用提醒。'})); return; }
+  var pu=cfg.push;
+  if(!pu||!pu.topic){ box.appendChild(el('p',{class:'small',text:'同步完成後會產生你的通知主題…'})); return; }
+  var ol=el('ol',{class:'steps'});
+  ol.appendChild(el('li',{text:'在 iPhone 的 App Store 安裝「ntfy」。'}));
+  var cp=el('button',{type:'button',class:'btn',text:'複製'}); cp.addEventListener('click',function(){ copyText(pu.topic,'已複製主題，貼到 ntfy 的「Topic name」'); });
+  ol.appendChild(el('li',{},[document.createTextNode('打開 ntfy，按右上角「＋」，主題（Topic name）貼上這串，按「Subscribe」。允許通知。'),el('div',{class:'topic'},[el('code',{text:pu.topic}),cp])]));
+  ol.appendChild(el('li',{text:'同步程式要換成新版：貼上新程式、執行一次「setupReminders」、用「新版本」重新部署（只要做一次）。'}));
+  var res=el('p',{class:'small push-res',role:'status','aria-live':'polite'});
+  var tb=el('button',{type:'button',class:'btn block',id:'btn-test-push',text:'送一則測試通知'});
+  tb.addEventListener('click',function(){ testPush(tb,res); });
+  ol.appendChild(el('li',{},[document.createTextNode('按下面的按鈕，手機收到「測試通知」就完成了。'),tb,res]));
+  box.appendChild(ol);
+  box.appendChild(el('p',{class:'small',text:'這串主題等於通知的地址，別人知道就能看到你的提醒，不要分享。'}));
+}
+function testPush(btn,res){
+  btn.disabled=true; res.className='small push-res'; res.textContent='送出中…';
+  fetch(cfg.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'testPush',token:cfg.sync.token,push:cfg.push,execUrl:cfg.sync.url}),redirect:'follow'})
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if(r&&r.error==='unauthorized') throw new Error('同步密碼不對');
+      if(!r||r.pushed===undefined) throw new Error('同步程式還是舊版：請貼上新版程式，並用「新版本」重新部署');
+      if(!r.ok) throw new Error(r.error==='ntfy 429'?'ntfy 暫時拒收（429），過幾分鐘再試':'通知沒送出（'+(r.error||'不明原因')+'）');
+      res.className='small push-res sync-ok';
+      res.textContent=r.reminders?'已送出，手機收到就完成了。自動提醒已啟用。':'已送出。但自動提醒還沒啟用：到 Apps Script 執行一次「setupReminders」。';
+    })
+    .catch(function(e){ res.className='small push-res err'; res.textContent='沒成功：'+((e&&e.message)||'連不上同步程式'); })
+    .then(function(){ btn.disabled=false; });
+}
 function renderRemind(){
   var box=$('remind-box'); box.innerHTML='';
   if(!syncReady()){ box.appendChild(el('p',{class:'small err',text:'要先設定上面的跨裝置同步，才能用提醒。'})); return; }
@@ -1064,23 +1168,33 @@ function renderOffAdd(){
   btn.addEventListener('click',function(){ offCal.toggle(); });
   box.appendChild(el('div',{class:'date-row'},[inp,btn,add])); box.appendChild(hint); box.appendChild(offCal.el);
 }
+var offShowAll=false;
 function renderOffDays(){
   if(!$('off-input')) renderOffAdd();
   var box=$('off-list'); box.innerHTML='';
   var ds=offDays(cfg||{}), t=todayISO(), lv=((cfg&&cfg.leaveDays)||[]).filter(function(l){ return l.date>=t; });
   box.appendChild(el('p',{class:'sub-h',text:'已加入（'+ds.length+' 天）'}));
   if(!ds.length) box.appendChild(el('p',{class:'small',text:'清單是空的：週末以外每天都會提醒。'}));
+  var OFF_SHOW=5, shown=offShowAll?ds:ds.slice(0,OFF_SHOW);
   var year='', ul=null;
-  ds.forEach(function(iso){
+  shown.forEach(function(iso){
     if(iso.slice(0,4)!==year){ year=iso.slice(0,4); box.appendChild(el('p',{class:'off-year',text:year+' 年'})); ul=el('ul',{class:'off-list'}); box.appendChild(ul); }
     var x=el('button',{type:'button',class:'x','aria-label':'刪除 '+fmtMD(iso),text:'✕'});
     x.addEventListener('click',function(){ setOffDays(offDays(cfg).filter(function(d){ return d!==iso; })); var h=$('off-hint'); if(h){ h.textContent='已刪除 '+ymdText(iso)+'（要加回來就在上面輸入）'; h.className='hint'; } });
     ul.appendChild(el('li',{},[el('span',{class:'d',text:fmtMD(iso)}),el('span',{class:'n',text:GOV_NAMES[iso]||'自己加的'}),x]));
   });
-  if(lv.length){
-    box.appendChild(el('p',{class:'sub-h',text:'請假（申請頁自動帶入）'}));
+  if(ds.length>OFF_SHOW){
+    var more=el('button',{type:'button',class:'linkbtn',id:'btn-off-more','aria-expanded':offShowAll?'true':'false',text:offShowAll?'只看接下來 '+OFF_SHOW+' 天':'顯示全部 '+ds.length+' 天'});
+    more.addEventListener('click',function(){ offShowAll=!offShowAll; renderOffDays(); var m=$('btn-off-more'); if(m) m.focus(); });
+    box.appendChild(more);
+  }
+  var ov=((cfg&&cfg.otDays)||[]).filter(function(o){ return o.date>=t; });
+  if(lv.length||ov.length){
+    box.appendChild(el('p',{class:'sub-h',text:'請假與加班（申請頁自動帶入）'}));
     var ul2=el('ul',{class:'off-list'});
-    lv.forEach(function(l){ ul2.appendChild(el('li',{},[el('span',{class:'d',text:ymdText(l.date)}),el('span',{class:'n',text:l.start+'–'+l.end})])); });
+    lv.map(function(l){ return {d:l.date,t:'請假 '+l.start+'–'+l.end}; }).concat(ov.map(function(o){ return {d:o.date,t:'加班 '+o.start+'–'+o.end}; }))
+      .sort(function(a,b){ return a.d<b.d?-1:a.d>b.d?1:0; })
+      .forEach(function(x){ ul2.appendChild(el('li',{},[el('span',{class:'d',text:ymdText(x.d)}),el('span',{class:'n',text:x.t})])); });
     box.appendChild(ul2);
     box.appendChild(el('p',{class:'small',style:'margin-top:4px',text:'要取消，到申請頁「最近的申請」刪除那一筆。'}));
   }
@@ -1092,7 +1206,10 @@ function updateLeaveDays(reqId,d){
   var t=todayISO(), list=(Array.isArray(cfg.leaveDays)?cfg.leaveDays:[]).filter(function(l){ return l.id!==reqId&&l.date>=t; });
   if(d&&d.kind==='leave') (d.days||[d]).forEach(function(x){ if(x.date&&x.date>=t) list.push({id:reqId,date:x.date,start:x.start,end:x.end}); });
   list.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
-  cfg.leaveDays=list; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); scheduleSync(); renderOffDays();
+  var ot=(Array.isArray(cfg.otDays)?cfg.otDays:[]).filter(function(o){ return o.id!==reqId&&o.date>=t; });
+  if(d&&d.kind==='overtime'&&d.date&&d.date>=t&&d.start&&d.end) ot.push({id:reqId,date:d.date,start:d.start,end:d.nextDay?'23:59':d.end});
+  ot.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
+  cfg.leaveDays=list; cfg.otDays=ot; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); scheduleSync(); renderOffDays();
 }
 function readSettings(){
   cfg=cfg||{v:1,forms:{}}; cfg.forms=cfg.forms||{}; cfg.supervisor=cfg.supervisor||{}; cfg.hr=cfg.hr||{}; cfg.work=cfg.work||{};
@@ -1117,7 +1234,7 @@ function readSettings(){
   }
   if(cfg.forms.clockin) cfg.forms.clockin.desc=$('cfg-clockin-desc').value.trim();
   cfg.submitMode=$('cfg-submit-mode').value;
-  cfg.updatedAt=nowMs(); renderRemind(); save(KEY_CFG,cfg); renderStatus(); renderPlaces(); renderSenderHint(); scheduleSync();
+  cfg.updatedAt=nowMs(); renderRemind(); renderPush(); save(KEY_CFG,cfg); renderStatus(); renderPlaces(); renderSenderHint(); scheduleSync();
   if(ows!==cfg.work.start||owe!==cfg.work.end) renderApply();
 }
 ['cfg-fullname','cfg-name','cfg-sender','cfg-sync-url','cfg-sync-token','cfg-sup-title','cfg-sup-email','cfg-hr-name','cfg-hr-email','cfg-cc-hr','cfg-work-start','cfg-work-end','cfg-clockin-url','cfg-clockin-desc','cfg-submit-mode'].forEach(function(id){ $(id).addEventListener('change',readSettings); });
@@ -1139,7 +1256,7 @@ $('btn-apply-code').addEventListener('click',function(){
   if(cfg.sync&&!(isSyncURL(cfg.sync.url)||!cfg.sync.url)) cfg.sync={url:'',token:''};
   if(cfg.sync&&!cfg.sync.url&&keep.sync&&isSyncURL(keep.sync.url)) cfg.sync={url:keep.sync.url,token:cfg.sync.token||keep.sync.token};
   cfg.updatedAt=nowMs();
-  ['submitMode','work','ccHr','ccHrV','offDays','leaveDays','holidaysV'].forEach(function(k){ if(cfg[k]==null&&keep[k]!=null) cfg[k]=keep[k]; });
+  ['submitMode','work','ccHr','ccHrV','offDays','leaveDays','otDays','push','holidaysV'].forEach(function(k){ if(cfg[k]==null&&keep[k]!=null) cfg[k]=keep[k]; });
   if(keep.supervisor&&keep.supervisor.email&&!(cfg.supervisor&&cfg.supervisor.email)) cfg.supervisor=keep.supervisor;
   if(keep.hr&&keep.hr.email&&!(cfg.hr&&cfg.hr.email)) cfg.hr=keep.hr;
   save(KEY_CFG,cfg); renderSettings(); renderStatus(); renderPlaces(); renderApply(); $('setup-code').value=''; syncNow(true);
@@ -1206,7 +1323,7 @@ function syncNow(force,soon){
     .then(function(res){
       if(!res||!res.ok) throw new Error(res&&res.error==='unauthorized'?'同步密碼不對':(res&&res.error)||'回應格式不對');
       var changed=mergeRemote(res);
-      setTimeout(function(){ mergeGovHolidays(); migrateCcHr(); },0);
+      setTimeout(function(){ mergeGovHolidays(); migrateCcHr(); ensurePush(); },0);
       /* 只把送出時的設定記為已同步；同步途中又改的設定，下次還會送 */
       var tookRemote=!!(res.config&&cfg.updatedAt===res.config.updatedAt&&cfg.updatedAt!==sentCfgAt);
       syncState={pushedAt:startedAt,configAt:tookRemote?cfg.updatedAt:Math.max(sentCfgAt,syncState.configAt||0),at:fmtDateLong(new Date())+' '+nowHM(),err:''};
@@ -1225,6 +1342,7 @@ function flushSync(){
   if(!up.length&&!c) return;
   try{ navigator.sendBeacon(cfg.sync.url,new Blob([JSON.stringify({op:'sync',token:cfg.sync.token,device:deviceLabel(),upsert:up,config:c})],{type:'text/plain;charset=utf-8'})); }catch(e){}
 }
+$('btn-reveal-token').addEventListener('click',function(){ var i=$('cfg-sync-token'), on=i.classList.toggle('masked'); this.textContent=on?'顯示':'隱藏'; this.setAttribute('aria-pressed',on?'false':'true'); });
 $('btn-sync-now').addEventListener('click',function(){ readSettings(); if(!syncReady()){ renderSyncStatus('請先填同步網址和同步密碼。','err'); return; } syncNow(true); });
 
 /* ───────── 啟動 ───────── */
@@ -1232,6 +1350,7 @@ $('banner-safari').hidden=!inSafari; $('banner-inapp').hidden=!inAppBrowser;
 renderHeader();
 try{ renderPlaces(); renderStatus(); renderApply(); renderReqs(); }
 catch(e){ showTab('settings'); toast('設定讀取失敗，請重新貼設定碼（'+e.message+'）','err'); }
+$('code-card').open=!cfg;
 if(!cfg) showTab('settings');
 renderSyncStatus(); if(syncReady()) syncNow(true); else { mergeGovHolidays(); migrateCcHr(); }
 window.daka={version:'1.5',fillApply:fillApply,parseTimeInput:parseTimeInput,parseDateInput:parseDateInput,syncNow:syncNow,mailFor:mailFor,formURLFor:formURLFor,applyData:applyData};
