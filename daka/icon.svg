@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-<title>打卡 App icon — E2 指針站牌｜白底＋黃</title>
-<rect width="1024" height="1024" fill="#FFFFFF"/>
-<path d="M860 590 A300 300 0 0 1 710 850" fill="none" stroke="#FFD300" stroke-width="120" stroke-linecap="butt"/>
-<rect x="0" y="515" width="560" height="150" fill="#DC241F"/>
-<rect x="510" y="0" width="100" height="590" fill="#00923F"/>
-<circle cx="560" cy="590" r="100" fill="#0019A8"/>
+<title>打卡 App icon — E2 套色偏移｜白底（深色模式黑底）</title>
+<defs><clipPath id="icon"><rect width="1024" height="1024"/></clipPath></defs>
+<style>.bg{fill:#FFFFFF}@media (prefers-color-scheme: dark){.bg{fill:#111111}}</style>
+<rect class="bg" width="1024" height="1024"/>
+<g clip-path="url(#icon)">
+<g transform="translate(27 18)"><path d="M864 576 A288 288 0 0 1 576 864" fill="none" stroke="#3550FF" stroke-width="96" stroke-linecap="butt"/><rect x="-80" y="528" width="656" height="96" fill="#23DBE0"/><rect x="528" y="-80" width="96" height="656" fill="#FF6DC0"/><circle cx="576" cy="576" r="72" fill="#FFE657"/></g>
+<g transform="translate(0 0)"><path d="M864 576 A288 288 0 0 1 576 864" fill="none" stroke="#FFD300" stroke-width="96" stroke-linecap="butt"/><rect x="-80" y="528" width="656" height="96" fill="#DC241F"/><rect x="528" y="-80" width="96" height="656" fill="#00923F"/><circle cx="576" cy="576" r="72" fill="#0019A8"/></g>
+</g>
 </svg>

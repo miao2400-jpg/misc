@@ -13,9 +13,9 @@
 <meta name="theme-color" content="#141516" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<link rel="manifest" href="manifest.webmanifest?v=3">
-<link rel="apple-touch-icon" href="icon-180.png?v=3">
-<link rel="icon" type="image/svg+xml" href="icon.svg?v=3">
+<link rel="manifest" href="manifest.webmanifest?v=4">
+<link rel="apple-touch-icon" href="icon-180.png?v=4">
+<link rel="icon" type="image/svg+xml" href="icon.svg?v=4">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=3">
 <style>
   :root{
@@ -38,7 +38,8 @@
   body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:var(--bg);z-index:20}
   header{padding:14px max(16px,env(safe-area-inset-right)) 6px max(16px,env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:8px}
   header h1{display:flex;align-items:center;gap:8px;font-size:22px;font-weight:700;color:var(--link)}
-  header h1 img{width:28px;height:28px;border-radius:var(--r);display:block}
+  header h1 picture{display:block;flex:none}
+  header h1 img{width:28px;height:28px;border-radius:var(--r);display:block;box-shadow:0 0 0 1px var(--line-strong)}
   header .date{font-size:14px;color:var(--sub)}
   main{padding:0 max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left))}
   section[hidden]{display:none}
@@ -191,7 +192,7 @@
 </style>
 </head>
 <body>
-<header><h1><img src="icon-header.svg?v=3" alt="" width="28" height="28">打卡</h1><span class="date" id="hdr-date"></span></header>
+<header><h1><picture><source srcset="icon-header-dark.svg?v=4" media="(prefers-color-scheme: dark)"><img src="icon-header.svg?v=4" alt="" width="28" height="28"></picture>打卡</h1><span class="date" id="hdr-date"></span></header>
 <main>
 <div id="banner-safari" class="banner warn" hidden><span id="banner-inapp" hidden>這一頁是從 LINE 或其他 App 裡點開的，請先按右上角的「⋯」或分享鈕，選「用 Safari 開啟」。</span>到了 Safari 之後，按下方的「分享」，選「加入主畫面」，之後從主畫面的「打卡」圖示打開再貼設定碼。在 Safari 裡貼的設定和打卡紀錄不會帶進主畫面的 App。</div>
 
