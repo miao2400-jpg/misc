@@ -158,6 +158,11 @@
   details.fold>summary::after{content:"";margin-left:auto;align-self:center;width:8px;height:8px;border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(45deg);transition:transform .15s}
   details.fold[open]>summary::after{transform:rotate(-135deg)}
   details.fold[open]>summary{margin-bottom:10px}
+  .topic{display:flex;align-items:center;gap:8px;margin:6px 0 2px}
+  .topic code{flex:1;min-width:0;overflow-wrap:anywhere;font-family:ui-monospace,Menlo,monospace;font-size:16px;background:var(--soft);border-radius:var(--r-sm);padding:8px 10px}
+  .topic .btn{flex:none}
+  ol.steps{padding-left:1.4em;margin:8px 0 0} ol.steps li{margin:0 0 10px}
+  .push-res{margin-top:8px}
   .sub-h{font-size:15px;font-weight:700;margin:16px 0 2px}
   .off-year{font-size:14px;font-weight:700;color:var(--sub);margin:10px 0 0}
   .off-list li{display:flex;align-items:center;gap:8px;min-height:44px;border-top:1px solid var(--line);list-style:none}
@@ -310,15 +315,17 @@
     <button class="btn block" id="btn-test-open">用表單網頁試開一次（不會送出）</button>
   </div>
   <div class="card">
-    <h2>忘記打卡提醒（iPhone 捷徑）</h2>
-    <p class="small">捷徑在你設定的時間問同步試算表「現在該打的卡打了沒」，沒打才跳通知。週末、下面的放假日、申請頁送出的請假時段都會自動跳過。</p>
-    <div id="remind-box"></div>
+    <h2>忘記打卡提醒</h2>
+    <p class="small">上班時間到了還沒有上班卡、應下班時間到了還沒有下班卡，手機就會跳通知，每 30 分鐘一次，最晚到 22:00。週末、放假日、請假時段不提醒；有加班申請時照加班時間提醒。</p>
+    <div id="push-box"></div>
     <h3 class="sub-h">不用提醒的日子</h3>
     <p class="small">已內建 2026–2027 國定假日。公司另外放假的日子在這裡加入。</p>
     <div id="off-add"></div>
     <div id="off-list"></div>
-    <details>
-      <summary>捷徑設定步驟</summary>
+    <details class="old-way">
+      <summary>改用 iPhone 捷徑（舊做法）</summary>
+      <p>已經設好推播的話，捷徑的自動化可以刪掉，不然同一件事會收到兩次通知。</p>
+      <div id="remind-box"></div>
       <p><b>先做一個捷徑</b>（「捷徑」App 下方的「捷徑」分頁）：</p>
       <ol>
         <li>右上角「＋」，命名「打卡檢查」。</li>
@@ -338,7 +345,7 @@
   </div>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.25 · 紀錄與設定存在這支手機；有設定同步的話，也會存一份到你自己的 Google 試算表。打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.26 · 紀錄與設定存在這支手機；有設定同步的話，也會存一份到你自己的 Google 試算表。打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -1061,7 +1068,7 @@ function renderSettings(){
   $('cfg-work-start').value=normHM(c.work&&c.work.start,'09:00'); $('cfg-work-end').value=normHM(c.work&&c.work.end,'18:00');
   $('cfg-clockin-url').value=(c.forms&&c.forms.clockin&&c.forms.clockin.url)||''; $('cfg-clockin-desc').value=(c.forms&&c.forms.clockin&&c.forms.clockin.desc)||'';
   $('cfg-submit-mode').value=(c.submitMode==='tab'?'tab':'iframe');
-  renderRemind(); renderOffDays();
+  renderRemind(); renderPush(); renderOffDays();
 }
 /* 忘記打卡提醒：給 iPhone 捷徑的檢查網址，與不用提醒的日子 */
 /* 政府行政機關辦公日曆表（115、116 年）裡落在平日的放假日；週末本來就不提醒。換年時更新這份清單與 HOLIDAYS_V */
@@ -1087,6 +1094,43 @@ function migrateCcHr(){
 }
 function ymdText(iso){ return (iso.slice(0,4)!==String(new Date().getFullYear())?iso.slice(0,4)+'/':'')+fmtMD(iso); }
 function checkURL(type){ return cfg.sync.url+'?token='+encodeURIComponent(cfg.sync.token)+'&check='+type; }
+/* 推播提醒（ntfy）：主題名稱和按鈕鑰匙在第一次同步完後產生，存在設定裡同步到試算表，讓 Apps Script 知道要推到哪裡 */
+function randStr(n){ var a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789', b=new Uint8Array(n), s=''; crypto.getRandomValues(b); for(var i=0;i<n;i++) s+=a[b[i]%a.length]; return s; }
+function ensurePush(){
+  if(!cfg||!syncReady()||(cfg.push&&cfg.push.topic&&cfg.push.key)) return;
+  cfg.push={topic:'daka-'+randStr(16),key:randStr(24)}; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); scheduleSync(); renderPush();
+}
+function renderPush(){
+  var box=$('push-box'); if(!box) return; box.innerHTML='';
+  if(!syncReady()){ box.appendChild(el('p',{class:'small err',text:'要先設定上面的跨裝置同步，才能用提醒。'})); return; }
+  var pu=cfg.push;
+  if(!pu||!pu.topic){ box.appendChild(el('p',{class:'small',text:'同步完成後會產生你的通知主題…'})); return; }
+  var ol=el('ol',{class:'steps'});
+  ol.appendChild(el('li',{text:'在 iPhone 的 App Store 安裝「ntfy」。'}));
+  var cp=el('button',{type:'button',class:'btn',text:'複製'}); cp.addEventListener('click',function(){ copyText(pu.topic,'已複製主題，貼到 ntfy 的「Topic name」'); });
+  ol.appendChild(el('li',{},[document.createTextNode('打開 ntfy，按右上角「＋」，主題（Topic name）貼上這串，按「Subscribe」。允許通知。'),el('div',{class:'topic'},[el('code',{text:pu.topic}),cp])]));
+  ol.appendChild(el('li',{text:'同步程式要換成新版：貼上新程式、執行一次「setupReminders」、用「新版本」重新部署（只要做一次）。'}));
+  var res=el('p',{class:'small push-res',role:'status','aria-live':'polite'});
+  var tb=el('button',{type:'button',class:'btn block',id:'btn-test-push',text:'送一則測試通知'});
+  tb.addEventListener('click',function(){ testPush(tb,res); });
+  ol.appendChild(el('li',{},[document.createTextNode('按下面的按鈕，手機收到「測試通知」就完成了。'),tb,res]));
+  box.appendChild(ol);
+  box.appendChild(el('p',{class:'small',text:'這串主題等於通知的地址，別人知道就能看到你的提醒，不要分享。'}));
+}
+function testPush(btn,res){
+  btn.disabled=true; res.className='small push-res'; res.textContent='送出中…';
+  fetch(cfg.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'testPush',token:cfg.sync.token,push:cfg.push,execUrl:cfg.sync.url}),redirect:'follow'})
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if(r&&r.error==='unauthorized') throw new Error('同步密碼不對');
+      if(!r||r.pushed===undefined) throw new Error('同步程式還是舊版：請貼上新版程式，並用「新版本」重新部署');
+      if(!r.ok) throw new Error(r.error==='ntfy 429'?'ntfy 暫時拒收（429），過幾分鐘再試':'通知沒送出（'+(r.error||'不明原因')+'）');
+      res.className='small push-res sync-ok';
+      res.textContent=r.reminders?'已送出，手機收到就完成了。自動提醒已啟用。':'已送出。但自動提醒還沒啟用：到 Apps Script 執行一次「setupReminders」。';
+    })
+    .catch(function(e){ res.className='small push-res err'; res.textContent='沒成功：'+((e&&e.message)||'連不上同步程式'); })
+    .then(function(){ btn.disabled=false; });
+}
 function renderRemind(){
   var box=$('remind-box'); box.innerHTML='';
   if(!syncReady()){ box.appendChild(el('p',{class:'small err',text:'要先設定上面的跨裝置同步，才能用提醒。'})); return; }
@@ -1144,10 +1188,13 @@ function renderOffDays(){
     more.addEventListener('click',function(){ offShowAll=!offShowAll; renderOffDays(); var m=$('btn-off-more'); if(m) m.focus(); });
     box.appendChild(more);
   }
-  if(lv.length){
-    box.appendChild(el('p',{class:'sub-h',text:'請假（申請頁自動帶入）'}));
+  var ov=((cfg&&cfg.otDays)||[]).filter(function(o){ return o.date>=t; });
+  if(lv.length||ov.length){
+    box.appendChild(el('p',{class:'sub-h',text:'請假與加班（申請頁自動帶入）'}));
     var ul2=el('ul',{class:'off-list'});
-    lv.forEach(function(l){ ul2.appendChild(el('li',{},[el('span',{class:'d',text:ymdText(l.date)}),el('span',{class:'n',text:l.start+'–'+l.end})])); });
+    lv.map(function(l){ return {d:l.date,t:'請假 '+l.start+'–'+l.end}; }).concat(ov.map(function(o){ return {d:o.date,t:'加班 '+o.start+'–'+o.end}; }))
+      .sort(function(a,b){ return a.d<b.d?-1:a.d>b.d?1:0; })
+      .forEach(function(x){ ul2.appendChild(el('li',{},[el('span',{class:'d',text:ymdText(x.d)}),el('span',{class:'n',text:x.t})])); });
     box.appendChild(ul2);
     box.appendChild(el('p',{class:'small',style:'margin-top:4px',text:'要取消，到申請頁「最近的申請」刪除那一筆。'}));
   }
@@ -1159,7 +1206,10 @@ function updateLeaveDays(reqId,d){
   var t=todayISO(), list=(Array.isArray(cfg.leaveDays)?cfg.leaveDays:[]).filter(function(l){ return l.id!==reqId&&l.date>=t; });
   if(d&&d.kind==='leave') (d.days||[d]).forEach(function(x){ if(x.date&&x.date>=t) list.push({id:reqId,date:x.date,start:x.start,end:x.end}); });
   list.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
-  cfg.leaveDays=list; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); scheduleSync(); renderOffDays();
+  var ot=(Array.isArray(cfg.otDays)?cfg.otDays:[]).filter(function(o){ return o.id!==reqId&&o.date>=t; });
+  if(d&&d.kind==='overtime'&&d.date&&d.date>=t&&d.start&&d.end) ot.push({id:reqId,date:d.date,start:d.start,end:d.nextDay?'23:59':d.end});
+  ot.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
+  cfg.leaveDays=list; cfg.otDays=ot; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); scheduleSync(); renderOffDays();
 }
 function readSettings(){
   cfg=cfg||{v:1,forms:{}}; cfg.forms=cfg.forms||{}; cfg.supervisor=cfg.supervisor||{}; cfg.hr=cfg.hr||{}; cfg.work=cfg.work||{};
@@ -1184,7 +1234,7 @@ function readSettings(){
   }
   if(cfg.forms.clockin) cfg.forms.clockin.desc=$('cfg-clockin-desc').value.trim();
   cfg.submitMode=$('cfg-submit-mode').value;
-  cfg.updatedAt=nowMs(); renderRemind(); save(KEY_CFG,cfg); renderStatus(); renderPlaces(); renderSenderHint(); scheduleSync();
+  cfg.updatedAt=nowMs(); renderRemind(); renderPush(); save(KEY_CFG,cfg); renderStatus(); renderPlaces(); renderSenderHint(); scheduleSync();
   if(ows!==cfg.work.start||owe!==cfg.work.end) renderApply();
 }
 ['cfg-fullname','cfg-name','cfg-sender','cfg-sync-url','cfg-sync-token','cfg-sup-title','cfg-sup-email','cfg-hr-name','cfg-hr-email','cfg-cc-hr','cfg-work-start','cfg-work-end','cfg-clockin-url','cfg-clockin-desc','cfg-submit-mode'].forEach(function(id){ $(id).addEventListener('change',readSettings); });
@@ -1206,7 +1256,7 @@ $('btn-apply-code').addEventListener('click',function(){
   if(cfg.sync&&!(isSyncURL(cfg.sync.url)||!cfg.sync.url)) cfg.sync={url:'',token:''};
   if(cfg.sync&&!cfg.sync.url&&keep.sync&&isSyncURL(keep.sync.url)) cfg.sync={url:keep.sync.url,token:cfg.sync.token||keep.sync.token};
   cfg.updatedAt=nowMs();
-  ['submitMode','work','ccHr','ccHrV','offDays','leaveDays','holidaysV'].forEach(function(k){ if(cfg[k]==null&&keep[k]!=null) cfg[k]=keep[k]; });
+  ['submitMode','work','ccHr','ccHrV','offDays','leaveDays','otDays','push','holidaysV'].forEach(function(k){ if(cfg[k]==null&&keep[k]!=null) cfg[k]=keep[k]; });
   if(keep.supervisor&&keep.supervisor.email&&!(cfg.supervisor&&cfg.supervisor.email)) cfg.supervisor=keep.supervisor;
   if(keep.hr&&keep.hr.email&&!(cfg.hr&&cfg.hr.email)) cfg.hr=keep.hr;
   save(KEY_CFG,cfg); renderSettings(); renderStatus(); renderPlaces(); renderApply(); $('setup-code').value=''; syncNow(true);
@@ -1273,7 +1323,7 @@ function syncNow(force,soon){
     .then(function(res){
       if(!res||!res.ok) throw new Error(res&&res.error==='unauthorized'?'同步密碼不對':(res&&res.error)||'回應格式不對');
       var changed=mergeRemote(res);
-      setTimeout(function(){ mergeGovHolidays(); migrateCcHr(); },0);
+      setTimeout(function(){ mergeGovHolidays(); migrateCcHr(); ensurePush(); },0);
       /* 只把送出時的設定記為已同步；同步途中又改的設定，下次還會送 */
       var tookRemote=!!(res.config&&cfg.updatedAt===res.config.updatedAt&&cfg.updatedAt!==sentCfgAt);
       syncState={pushedAt:startedAt,configAt:tookRemote?cfg.updatedAt:Math.max(sentCfgAt,syncState.configAt||0),at:fmtDateLong(new Date())+' '+nowHM(),err:''};
