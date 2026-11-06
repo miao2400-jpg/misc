@@ -317,7 +317,7 @@
   </div>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.24 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.25 · 紀錄與設定只存在這支手機，這個 App 本身不會上傳任何資料；打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -555,7 +555,8 @@ if(window.visualViewport){
   window.visualViewport.addEventListener('scroll',placeNav);
 }
 ['orientationchange','pageshow','focus'].forEach(function(e){ window.addEventListener(e,function(){ setTimeout(placeNav,300); }); });
-document.addEventListener('visibilitychange',refresh);
+document.addEventListener('visibilitychange',function(ev){ if(document.hidden) flushSync(); else refresh(ev); });
+window.addEventListener('pagehide',function(){ flushSync(); });
 window.addEventListener('pageshow',refresh);
 window.addEventListener('focus',refresh);
 setInterval(refresh,60000);
@@ -1214,6 +1215,15 @@ function syncNow(force,soon){
     })
     .catch(function(e){ syncState.err=(e&&e.message)||'連不上'; save(KEY_SYNC,syncState); })
     .then(function(){ syncBusy=false; renderSyncStatus(); });
+}
+/* 打完卡馬上切走 App 時，iPhone 會暫停網頁，排好的同步就沒跑。離開前用 sendBeacon 先把還沒同步的送出去；
+   不等回應、也不改同步狀態，下次正常同步會再對一次（伺服器端用 updatedAt 合併，重送不會重複） */
+function flushSync(){
+  if(!syncReady()||!navigator.sendBeacon) return;
+  var since=syncState.pushedAt||0, up=log.filter(function(r){ return (r.updatedAt||0)>since; });
+  var c=((cfg.updatedAt||0)>(syncState.configAt||0))?cfg:null;
+  if(!up.length&&!c) return;
+  try{ navigator.sendBeacon(cfg.sync.url,new Blob([JSON.stringify({op:'sync',token:cfg.sync.token,device:deviceLabel(),upsert:up,config:c})],{type:'text/plain;charset=utf-8'})); }catch(e){}
 }
 $('btn-sync-now').addEventListener('click',function(){ readSettings(); if(!syncReady()){ renderSyncStatus('請先填同步網址和同步密碼。','err'); return; } syncNow(true); });
 
