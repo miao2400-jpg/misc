@@ -152,10 +152,13 @@
   .cal-d.sel{background:var(--navy);color:#fff}
   .cal-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font-size:14px;color:var(--sub)}
   .cal-foot button{font:inherit;font-size:14px;color:var(--link);background:transparent;border:0;min-height:44px;padding:0 6px}
-  details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;gap:10px;min-height:44px;margin:-4px 0}
+  details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:44px;margin:-4px 0}
+  .fold-h{flex:1;min-width:0}
+  .fold-h .fold-state{display:block;margin-top:2px;overflow-wrap:anywhere;font-weight:400}
+  .fold-state.warn{color:var(--danger);font-weight:700}
   details.fold>summary::-webkit-details-marker{display:none}
   details.fold>summary h2{margin:0}
-  details.fold>summary::after{content:"";margin-left:auto;align-self:center;width:8px;height:8px;border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(45deg);transition:transform .15s}
+  details.fold>summary::after{content:"";flex:none;margin-left:auto;align-self:center;width:8px;height:8px;border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(45deg);transition:transform .15s}
   details.fold[open]>summary::after{transform:rotate(-135deg)}
   details.fold[open]>summary{margin-bottom:10px}
   .topic{display:flex;align-items:center;gap:8px;margin:6px 0 2px}
@@ -271,7 +274,7 @@
 <!-- ───────── 設定 ───────── -->
 <section id="tab-settings" hidden>
   <details class="card fold" id="code-card">
-    <summary><h2>設定碼</h2><span class="small">換手機、重新設定時才用</span></summary>
+    <summary><div class="fold-h"><h2>設定碼</h2><span class="small fold-state">換手機、重新設定時才用</span></div></summary>
     <textarea id="setup-code" placeholder="把設定碼貼在這裡，再按「套用」" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
     <div class="row" style="margin-top:8px">
       <button class="btn primary" id="btn-apply-code">套用</button>
@@ -279,8 +282,8 @@
     </div>
     <div id="code-msg" class="small" style="margin-top:8px" role="status" aria-live="polite"></div>
   </details>
-  <div class="card">
-    <h2>我與公司</h2>
+  <details class="card fold" id="me-card">
+    <summary><div class="fold-h"><h2>我與公司</h2><span class="small fold-state" id="me-card-state"></span></div></summary>
     <label class="f"><span>我的全名（信件主旨用，例如：王小明）</span><input id="cfg-fullname" type="text" autocomplete="name"></label>
     <label class="f"><span>信件署名（例如：小明）</span><input id="cfg-name" type="text"></label>
     <label class="f"><span>我的公司信箱（寄件者，只用來提醒）</span><input id="cfg-sender" type="email" autocomplete="email" inputmode="email"></label>
@@ -293,17 +296,18 @@
       <label class="f"><span>上班時間（例如 0900）</span><input id="cfg-work-start" type="text" inputmode="numeric" autocomplete="off" placeholder="0900"></label>
       <label class="f"><span>下班時間（例如 1800）</span><input id="cfg-work-end" type="text" inputmode="numeric" autocomplete="off" placeholder="1800"></label>
     </div>
-  </div>
-  <div class="card">
-    <h2>跨裝置同步（用你自己的 Google 試算表）</h2>
+  </details>
+  <details class="card fold" id="sync-card">
+    <summary><div class="fold-h"><h2>跨裝置同步</h2><span class="small fold-state" id="sync-card-state"></span></div></summary>
+    <p class="small">用你自己的 Google 試算表，在手機和電腦之間同步紀錄與設定。</p>
     <label class="f"><span>同步網址（Apps Script 部署後的網址，結尾是 /exec）</span><input id="cfg-sync-url" type="url" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     <label class="f"><span>同步密碼</span></label>
     <div class="fld mask-fld"><input id="cfg-sync-token" class="masked" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="同步密碼"><button type="button" class="linkbtn in-reveal" id="btn-reveal-token" aria-pressed="false">顯示</button></div>
     <button class="btn block" id="btn-sync-now">立即同步</button>
     <p class="small" id="sync-status" style="margin-top:8px">尚未設定同步。</p>
-  </div>
-  <div class="card">
-    <h2>打卡表單</h2>
+  </details>
+  <details class="card fold" id="form-card">
+    <summary><div class="fold-h"><h2>打卡表單</h2><span class="small fold-state" id="form-card-state"></span></div></summary>
     <label class="f"><span>表單網址（HR 換新表單時才需要改）</span><input id="cfg-clockin-url" type="url" autocomplete="off"></label>
     <label class="f"><span>表單說明</span><input id="cfg-clockin-desc" type="text"></label>
     <label class="f"><span>打卡的送出方式</span>
@@ -313,15 +317,11 @@
       </select></label>
     <p class="small" style="margin-top:8px">沒有網路時，送出後下方會一片空白，那筆並沒有送到 Google。有網路卻一直空白，才改成「在 Safari 開已預填的表單」。</p>
     <button class="btn block" id="btn-test-open">用表單網頁試開一次（不會送出）</button>
-  </div>
-  <div class="card">
-    <h2>忘記打卡提醒</h2>
+  </details>
+  <details class="card fold" id="remind-card">
+    <summary><div class="fold-h"><h2>忘記打卡提醒</h2><span class="small fold-state" id="remind-card-state"></span></div></summary>
     <p class="small">上班時間到了還沒有上班卡、應下班時間到了還沒有下班卡，手機就會跳通知，每 30 分鐘一次，最晚到 22:00。週末、放假日、請假時段不提醒；有加班申請時照加班時間提醒。</p>
     <div id="push-box"></div>
-    <h3 class="sub-h">不用提醒的日子</h3>
-    <p class="small">已內建 2026–2027 國定假日。公司另外放假的日子在這裡加入。</p>
-    <div id="off-add"></div>
-    <div id="off-list"></div>
     <details class="old-way">
       <summary>改用 iPhone 捷徑（舊做法）</summary>
       <p>已經設好推播的話，捷徑的自動化可以刪掉，不然同一件事會收到兩次通知。</p>
@@ -342,10 +342,16 @@
       <p>同一個網址會自己判斷：08:30 起還沒打上班卡就提醒；打了上班卡，滿 9 小時（含午休）還沒打下班卡就提醒；打過、請假、週末、放假日都不提醒。</p>
       <p>想先試試看：把檢查網址貼到 Safari 打開，會看到「還沒打上班卡！」或「預計 18:24 下班，現在不用提醒」這類的一句話。</p>
     </details>
-  </div>
+  </details>
+  <details class="card fold" id="off-card" open>
+    <summary><div class="fold-h"><h2>不用提醒的日子</h2><span class="small fold-state" id="off-card-state"></span></div></summary>
+    <p class="small">已內建 2026–2027 國定假日。公司另外放假的日子在這裡加入。</p>
+    <div id="off-add"></div>
+    <div id="off-list"></div>
+  </details>
   <div class="card">
     <button class="btn danger block" id="btn-clear">清除這支手機上的所有資料</button>
-    <p class="small muted" style="margin-top:8px">版本 1.26 · 紀錄與設定存在這支手機；有設定同步的話，也會存一份到你自己的 Google 試算表。打卡內容只會送到 HR 的 Google 表單。</p>
+    <p class="small muted" style="margin-top:8px">版本 1.27 · 紀錄與設定存在這支手機；有設定同步的話，也會存一份到你自己的 Google 試算表。打卡內容只會送到 HR 的 Google 表單。</p>
   </div>
 </section>
 </main>
@@ -368,7 +374,7 @@ function load(k,def){ try{ var v=localStorage.getItem(k); return v?JSON.parse(v)
 function save(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ alert('無法儲存：'+e.message); } }
 var cfg=load(KEY_CFG,null), log=load(KEY_LOG,[]), reqs=load(KEY_REQ,[]), prefs={place:'',other:''};
 try{ localStorage.removeItem(KEY_PREF); }catch(e){}
-var freq=load(KEY_FREQ,{}), syncState=load(KEY_SYNC,{});
+var freq=load(KEY_FREQ,{}), syncState=load(KEY_SYNC,{}), KEY_PUSHRES='daka.pushres', pushRes=load(KEY_PUSHRES,'');
 if(!freq||typeof freq!=='object') freq={}; if(!syncState||typeof syncState!=='object') syncState={};
 if(!Array.isArray(log)) log=[]; if(!Array.isArray(reqs)) reqs=[];
 
@@ -1060,6 +1066,7 @@ function copyText(text,okMsg){
 
 /* ───────── 設定 ───────── */
 function renderSettings(){
+  setTimeout(function(){ renderFoldStates(true); },0);
   var c=cfg||{};
   $('cfg-fullname').value=c.fullName||''; $('cfg-name').value=c.name||''; $('cfg-sender').value=c.senderEmail||'';
   $('cfg-sync-url').value=(c.sync&&c.sync.url)||''; $('cfg-sync-token').value=(c.sync&&c.sync.token)||''; renderSyncStatus();
@@ -1100,6 +1107,23 @@ function ensurePush(){
   if(!cfg||!syncReady()||(cfg.push&&cfg.push.topic&&cfg.push.key)) return;
   cfg.push={topic:'daka-'+randStr(16),key:randStr(24)}; cfg.updatedAt=nowMs(); save(KEY_CFG,cfg); scheduleSync(); renderPush();
 }
+/* 設定頁每一區收成一行，標題下寫目前狀態；有問題的那區自動展開 */
+function foldState(id,text,warn,autoOpen){
+  var st=$(id+'-state'), d=$(id); if(!st||!d) return;
+  st.textContent=text; st.className='small fold-state'+(warn?' warn':'');
+  if(warn&&autoOpen) d.open=true;
+}
+function renderFoldStates(autoOpen){
+  var c=cfg||{}, sup=c.supervisor||{}, ci=(c.forms||{}).clockin||{};
+  foldState('me-card',sup.email?[c.fullName||c.name||'（未填名字）','主管 '+(sup.title||sup.email),(c.ccHr!==false?'副本 HR':'不副本 HR')].join(' · '):'還沒填主管 Email',!sup.email,autoOpen);
+  var sr=syncReady();
+  foldState('sync-card',!sr?'還沒設定（提醒功能需要它）':syncState.err?'上次同步失敗：'+syncState.err:syncState.at?'上次同步 '+syncState.at:'已設定，還沒同步',sr&&!!syncState.err,autoOpen);
+  foldState('form-card',ci.url?(ci.title||'已設定')+(c.submitMode==='tab'?' · 在 Safari 送出':''):'還沒設定，請先貼設定碼',!ci.url,autoOpen);
+  var pr=pushRes||'';
+  foldState('remind-card',!sr?'要先設定跨裝置同步':!(c.push&&c.push.topic)?'同步後會產生通知主題':pr==='ok'?'推播已啟用':pr?'測試通知沒成功：'+pr:'還沒送過測試通知',sr&&!!pr&&pr!=='ok',autoOpen);
+  var od=offDays(c).length;
+  foldState('off-card','接下來 '+od+' 天',false,false);
+}
 function renderPush(){
   var box=$('push-box'); if(!box) return; box.innerHTML='';
   if(!syncReady()){ box.appendChild(el('p',{class:'small err',text:'要先設定上面的跨裝置同步，才能用提醒。'})); return; }
@@ -1125,10 +1149,11 @@ function testPush(btn,res){
       if(r&&r.error==='unauthorized') throw new Error('同步密碼不對');
       if(!r||r.pushed===undefined) throw new Error('同步程式還是舊版：請貼上新版程式，並用「新版本」重新部署');
       if(!r.ok) throw new Error(r.error==='ntfy 429'?'ntfy 暫時拒收（429），過幾分鐘再試':'通知沒送出（'+(r.error||'不明原因')+'）');
+      pushRes=r.reminders?'ok':'自動提醒還沒啟用'; save(KEY_PUSHRES,pushRes); renderFoldStates(false);
       res.className='small push-res sync-ok';
       res.textContent=r.reminders?'已送出，手機收到就完成了。自動提醒已啟用。':'已送出。但自動提醒還沒啟用：到 Apps Script 執行一次「setupReminders」。';
     })
-    .catch(function(e){ res.className='small push-res err'; res.textContent='沒成功：'+((e&&e.message)||'連不上同步程式'); })
+    .catch(function(e){ var m=(e&&e.message)||'連不上同步程式'; pushRes=m; save(KEY_PUSHRES,pushRes); renderFoldStates(false); res.className='small push-res err'; res.textContent='沒成功：'+m; })
     .then(function(){ btn.disabled=false; });
 }
 function renderRemind(){
@@ -1268,8 +1293,8 @@ $('btn-export-code').addEventListener('click',function(){
 });
 $('btn-clear').addEventListener('click',function(){
   if(!confirm('確定清除設定、打卡紀錄、申請紀錄？')) return;
-  [KEY_CFG,KEY_LOG,KEY_REQ,KEY_PREF,KEY_FREQ,KEY_SYNC].forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
-  cfg=null; log=[]; reqs=[]; prefs={place:'',other:''}; freq={}; syncState={}; clearTimeout(syncTimer);
+  [KEY_CFG,KEY_LOG,KEY_REQ,KEY_PREF,KEY_FREQ,KEY_SYNC,KEY_PUSHRES].forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+  cfg=null; log=[]; reqs=[]; prefs={place:'',other:''}; freq={}; syncState={}; pushRes=''; clearTimeout(syncTimer);
   clearTimeout(waitTimer); lastEntryId=null; lastType=null; lastPlace=null; lockUntil=0; setLocked(false);
   $('result-card').hidden=true; $('result-frame').innerHTML=''; $('result-err').hidden=true; $('btn-confirm').hidden=true;
   renderSettings(); renderStatus(); renderPlaces(); renderLog(); renderReqs(); renderApply(); showTab('settings');
@@ -1285,7 +1310,8 @@ function scheduleSync(){
   /* 等過 syncNow 的 3 秒間隔，同步進行中就再排一次，改動才不會被略過 */
   syncTimer=setTimeout(function(){ if(syncBusy) scheduleSync(); else syncNow(true); },Math.max(1500,3100-(Date.now()-lastSyncTry)));
 }
-function renderSyncStatus(msg,kind){
+function renderSyncStatus(msg,kind){ renderSyncLine(msg,kind); if(!msg) renderFoldStates(true); }
+function renderSyncLine(msg,kind){
   var e=$('sync-status'); if(!e) return;
   if(msg){ e.textContent=msg; e.className='small '+(kind||''); return; }
   if(!syncReady()){ e.textContent='尚未設定同步。'; e.className='small'; return; }

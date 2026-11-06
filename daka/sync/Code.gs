@@ -155,6 +155,7 @@ function remindTick() {
   return 'pushed ' + pl.want + ' ' + code;
 }
 
+let pushErr_ = '';
 function push_(pu, title, message, execUrl) {
   const body = { topic: pu.topic, title: title, message: message, priority: 4, tags: ['alarm_clock'] };
   if (execUrl && /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(execUrl)) {
@@ -166,12 +167,19 @@ function push_(pu, title, message, execUrl) {
   }
   // ntfy.sh 對沒登入的發送者有每日上限；Google 的伺服器是很多人共用的，萬一常收到 429，
   // 到 ntfy.sh 註冊免費帳號產生存取權杖，放進「專案設定 → 指令碼屬性」，名稱 NTFY_TOKEN
-  const tk = PropertiesService.getScriptProperties().getProperty('NTFY_TOKEN');
-  const res = UrlFetchApp.fetch('https://ntfy.sh/', {
-    method: 'post', contentType: 'application/json', payload: JSON.stringify(body), muteHttpExceptions: true,
-    headers: tk ? { Authorization: 'Bearer ' + tk } : {}
-  });
-  return res.getResponseCode();
+  const tk = String(PropertiesService.getScriptProperties().getProperty('NTFY_TOKEN') || '').trim().replace(/^Bearer\s+/i, '').trim();
+  try {
+    const res = UrlFetchApp.fetch('https://ntfy.sh/', {
+      method: 'post', contentType: 'application/json', payload: JSON.stringify(body), muteHttpExceptions: true,
+      headers: tk ? { Authorization: 'Bearer ' + tk } : {}
+    });
+    pushErr_ = '';
+    return res.getResponseCode();
+  } catch (err) {
+    // 連線逾時或連不上：回 0，讓呼叫的地方顯示原因，而不是整個請求失敗
+    pushErr_ = String((err && err.message) || err).slice(0, 200);
+    return 0;
+  }
 }
 
 /* 通知上的按鈕：用 App 產生的提醒鑰匙，不是同步密碼 */
@@ -196,7 +204,8 @@ function doPost(e) {
     if (!pu) return out_({ ok: false, error: 'bad topic' });
     const code = push_(pu, '測試通知', '收到這則，推播提醒就設定好了。', req.execUrl);
     const triggers = ScriptApp.getProjectTriggers().filter(function (t) { return t.getHandlerFunction() === 'remindTick'; }).length;
-    return out_({ ok: code >= 200 && code < 300, pushed: code, reminders: triggers > 0, error: code >= 300 ? 'ntfy ' + code : '' });
+    return out_({ ok: code >= 200 && code < 300, pushed: code, reminders: triggers > 0,
+      error: code === 0 ? '連不上 ntfy：' + pushErr_ : code >= 300 ? 'ntfy ' + code : '' });
   }
   const lock = LockService.getScriptLock();
   lock.waitLock(15000);
